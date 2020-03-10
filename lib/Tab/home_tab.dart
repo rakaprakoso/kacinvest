@@ -360,7 +360,7 @@ ListView _activityList() {
         child: ListTile(
           leading: Image.asset('assets/images/Nike.png'),
           title: Text(
-            'Nike Medieval',
+            'Reksa Dana',
             style: TextStyle(
               fontFamily: "worksans",
               fontWeight: FontWeight.w500,
