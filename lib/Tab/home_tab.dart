@@ -358,21 +358,21 @@ ListView _activityList() {
         margin: EdgeInsets.only(bottom: 15),
         decoration: _tileDecoration(),
         child: ListTile(
-          leading: Image.asset('assets/images/Nike.png'),
+          leading: Image.asset('assets/images/users/Bank_Syariah_Mandiri.png'),
           title: Text(
-            'Reksa Dana',
+            'Mandiri Syariah Reksa Dana',
             style: TextStyle(
               fontFamily: "worksans",
               fontWeight: FontWeight.w500,
               color: Colors.black),
           ),
           subtitle: Text(
-            'Jan 21, 2019',
+            'Mar 10, 2020',
             style:
             TextStyle(fontFamily: "worksans", fontWeight: FontWeight.w300),
           ),
           trailing: Text(
-            '-249,99 USD',
+            '- 30,000',
             style: TextStyle(fontFamily: "worksans"),
           ),
         ),
@@ -383,22 +383,22 @@ ListView _activityList() {
         child: ListTile(
           leading: Container(
             width: 42,
-            child: Image.asset('assets/images/if_9_avatar_2754584.png'),
+            child: Image.asset('assets/images/users/BNP_Paribas.jpg'),
           ),
           title: Text(
-            'Lagertha Lothbrok',
+            'BNP Paribas Pesona',
             style: TextStyle(
               fontFamily: "worksans",
               fontWeight: FontWeight.w500,
               color: Colors.black),
           ),
           subtitle: Text(
-            'Jan 18, 2019',
+            'Feb 18, 2020',
             style:
             TextStyle(fontFamily: "worksans", fontWeight: FontWeight.w300),
           ),
           trailing: Text(
-            '+102,00 USD',
+            '+50,000',
             style: TextStyle(fontFamily: "worksans"),
           ),
         ),
@@ -411,7 +411,7 @@ ListView _activityList() {
             child: Container(
               color: PaypalColors.LightBlue,
               child: Image.asset(
-                "assets/images/icon_shop.png",
+                "assets/images/users/Avrist.png",
                 fit: BoxFit.scaleDown,
                 width: 35.0,
                 height: 35.0,
@@ -419,19 +419,19 @@ ListView _activityList() {
             ),
           ),
           title: Text(
-            'Spotify Finance Limited',
+            'Avrist Equity - Cross Sectoral',
             style: TextStyle(
               fontFamily: "worksans",
               fontWeight: FontWeight.w500,
               color: Colors.black),
           ),
           subtitle: Text(
-            'Jan 11, 2019',
+            'Jan 11, 2020',
             style:
             TextStyle(fontFamily: "worksans", fontWeight: FontWeight.w300),
           ),
           trailing: Text(
-            '-9,99 USD',
+            '-50,000',
             style: TextStyle(fontFamily: "worksans"),
           ),
         ),
