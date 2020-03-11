@@ -323,7 +323,7 @@ Container _activityText() {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: < Widget > [
         Text(
-          'Activity',
+          'Transactions',
           style: TextStyle(
             fontFamily: "worksans",
             fontSize: 15,
