@@ -431,7 +431,7 @@ ListView _activityList() {
             TextStyle(fontFamily: "worksans", fontWeight: FontWeight.w300),
           ),
           trailing: Text(
-            '-50,000',
+            '-40,000',
             style: TextStyle(fontFamily: "worksans"),
           ),
         ),
