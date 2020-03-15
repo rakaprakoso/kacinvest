@@ -35,7 +35,7 @@
 			<th>Opsi</th>		
 		</tr>
 		<?php 
-		require_once 'Connexion.php'; 
+		require_once 'Connection.php'; 
         $query = " SELECT * FROM AccountProfile ";
 
         $result = mysqli_query($con,$query);
@@ -50,8 +50,8 @@
 			<td><?php echo $data['referralCode']; ?></td>
 			<td><?php echo $data['bankAccountNumber']; ?></td>
 			<td>
-				<a class="edit" href="edit.php?id=<?php echo $data['id']; ?>">Edit</a> |
-				<a class="hapus" href="hapus.php?id=<?php echo $data['id']; ?>">Hapus</a>					
+				<a class="edit" href="edit.php?username=<?php echo $data['username']; ?>">Edit</a> |
+				<a class="hapus" href="hapus.php?username=<?php echo $data['username']; ?>">Hapus</a>					
 			</td>
 		</tr>
         <?php }?>
@@ -71,7 +71,7 @@
 			<th>Opsi</th>		
 		</tr>
 		<?php 
-		require_once 'Connexion.php'; 
+		require_once 'Connection.php'; 
         $query = " SELECT * FROM AccountBalance ";
 
         $result = mysqli_query($con,$query);
@@ -87,8 +87,8 @@
             <td><?php echo $data['balanceStart']; ?></td>
             <td><?php echo $data['stockNABunit']; ?></td>
 			<td>
-				<a class="edit" href="edit.php?id=<?php echo $data['id']; ?>">Edit</a> |
-				<a class="hapus" href="hapus.php?id=<?php echo $data['id']; ?>">Hapus</a>					
+				<a class="edit" href="edit.php?username=<?php echo $data['username']; ?>">Edit</a> |
+				<a class="hapus" href="hapus.php?username=<?php echo $data['username']; ?>">Hapus</a>					
 			</td>
 		</tr>
         <?php }?>
