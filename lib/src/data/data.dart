@@ -3,7 +3,7 @@ import 'package:kacinvest/src/models/credit_card_model.dart';
 import 'package:kacinvest/src/models/payment_model.dart';
 import 'package:kacinvest/src/models/user_model.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert'
+import 'dart:convert';
 
 
 List<CreditCardModel> getCreditCards() {
@@ -32,7 +32,7 @@ List<UserModel> getUsersCard() {
   return userCards;
 }
 
-List<Account> getAccount() {
+/*List<Account> getAccount() {
   List<UserModel> account = [
     UserModel("Mandiri Syariah Reksa Dana", "assets/images/users/Bank_Syariah_Mandiri.png", "7%"),
     UserModel("Standard Chartered", "assets/images/users/Standard_Chartered.png","2%"),
@@ -41,7 +41,7 @@ List<Account> getAccount() {
   ];
 
   return account;
-}
+}*/
 
 List<PaymentModel> getPaymentsCard() {
   List<PaymentModel> paymentCards = [

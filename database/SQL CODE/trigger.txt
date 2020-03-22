@@ -1,0 +1,185 @@
+CREATE TRIGGER af_buy_AccountBalance after INSERT ON AccountTransaction
+ FOR EACH ROW BEGIN
+ INSERT INTO AccountBalance SET
+ AccountBalance.username = NEW.username, AccountBalance.stockID=New.stockID, balanceStart=NEW.Debit+NEW.Credit, stockNABunit=New.Unit
+ ON DUPLICATE KEY UPDATE balanceStart=balanceStart+New.Debit+New.Credit, stockNABunit=stockNABunit+New.Unit;
+ END
+--------------------------------------------------------------------------------------
+
+ SELECT Debit, PriceNAB, (Debit/priceNAB) as UNITNAB FROM AccountTransaction, stockProduct
+
+--------------------------------------------------------------------------------------
+ DELIMITER $$
+CREATE TRIGGER af_buy_AccountTransaction after INSERT ON AccountTransaction
+ FOR EACH ROW BEGIN
+ 
+ DECLARE NABunit int;
+ DECLARE CurrentBalance int;
+ SET NABunit = SELECT PriceNAB FROM stockProduct where stockID=New.stockID;
+ SET CurrentBalance = SELECT AccountBalance.balanceStart FROM AccountBalance where stockID=New.stockID and username=New.username;
+
+ 
+ update AccountTransaction set New.Unit = New.Debit/NABunit;
+ update AccountTransaction set New.Balance = CurrentBalance + New.Debit;
+ 
+ END$$
+ 
+ DELIMITER ;
+
+ ----------------------------------------------------------
+ SELECT PriceNAB FROM stockProduct where stockID="stk00001"
+ ------------------------------------------------------------
+ DELIMITER $$
+CREATE TRIGGER af_buy_AccountTransaction after INSERT ON AccountTransaction
+ FOR EACH ROW BEGIN
+ 
+
+ SELECT PriceNAB into @NABunit FROM stockProduct where stockID=New.stockID;
+  SELECT AccountBalance.balanceStart into @CurrentBalance FROM AccountBalance where stockID=New.stockID and username=New.username;
+
+ 
+ update AccountTransaction set New.Unit = New.Debit/NABunit;
+ update AccountTransaction set New.Balance = CurrentBalance + New.Debit;
+ 
+ END$$
+ 
+ DELIMITER ;
+
+ ------------------------------------------------------------------------
+ DROP TRIGGER IF EXISTS `af_buy_AccountTransaction`;CREATE DEFINER=`u335917972_kacinvest`@`127.0.0.1` TRIGGER `af_buy_AccountTransaction` BEFORE INSERT ON `AccountTransaction` FOR EACH ROW BEGIN
+ 
+
+ SELECT PriceNAB into @NABunit FROM stockProduct where stockID=New.stockID;
+  SELECT AccountBalance.balanceStart into @CurrentBalance FROM AccountBalance where stockID=New.stockID and username=New.username;
+
+ 
+ update AccountTransaction set New.Unit = New.Debit/@NABunit;
+ update AccountTransaction set New.Balance = @CurrentBalance + New.Debit;
+ 
+ END
+ --------------------------------------------------------------------------------------
+ DELIMITER $$
+CREATE TRIGGER af_buy_stockProduct after INSERT ON AccountTransaction
+ FOR EACH ROW BEGIN
+ update stockProduct SET
+ stockProduct.availableTotalNAB = stockProduct.availableTotalNAB - New.Unit where stockID=New.stockID;
+
+ END$$
+ --------------------------------------------------
+ CREATE TRIGGER `af_buy_stockProduct` AFTER INSERT ON `AccountTransaction`
+ FOR EACH ROW BEGIN
+ update stockProduct SET
+ stockProduct.availableTotalNAB = stockProduct.availableTotalNAB - New.Unit where stockID=New.stockID;
+
+ END
+ --------------------------------------------------
+ CREATE TRIGGER `af_buy_AccountTransaction` BEFORE INSERT ON `AccountTransaction`
+ FOR EACH ROW BEGIN
+ 
+
+SELECT PriceNAB into @NABunit FROM stockProduct where stockID=New.stockID;
+SELECT AccountBalance.balanceStart into @CurrentBalance FROM AccountBalance where stockID=New.stockID and username=New.username;
+
+ 
+set New.Unit = New.Debit/@NABunit;
+set New.Balance = @CurrentBalance + New.Debit;
+ 
+ END
+ ---------------------------------------
+ CREATE TRIGGER `af_buy_balanceTransaction` AFTER INSERT ON `AccountBalance`
+ FOR EACH ROW BEGIN
+
+SELECT AccountBalance.balanceStart into @CurrentBalance FROM AccountBalance where stockID=New.stockID and username=New.username;
+
+update AccountTransaction set Balance = @CurrentBalance + Debit where username=new.username and stockID=new.stockID ORDER BY IDTransaction
+DESC LIMIT 1;
+ 
+ END
+ ----------------------------------------------------
+ SELECT AccountBalance.balanceStart into @CurrentBalance FROM AccountBalance where username='rakadprakoso' and stockID='stk00001';
+
+
+update AccountTransaction set Balance = @CurrentBalance where username='rakadprakoso' and stockID='stk00001' ORDER BY IDTransaction DESC LIMIT 1;
+
+select balance from AccountTransaction where username='rakadprakoso' and stockID='stk00001' ORDER BY IDTransaction DESC LIMIT 1;
+---------------------------------------------
+SELECT AccountBalance.balanceStart into @CurrentBalance FROM AccountBalance where username='rakadprakoso' and stockID='stk00001';
+
+
+update AccountTransaction set Balance = @CurrentBalance where username='rakadprakoso' and stockID='stk00001' ORDER BY IDTransaction DESC LIMIT 1;
+-----------------------------------------------------
+BEGIN
+SELECT AccountBalance.balanceStart into @CurrentBalance FROM AccountBalance where username=new.username and stockID=new.stockID;
+
+
+update AccountTransaction set Balance = @CurrentBalance where username=new.username and stockID=new.stockID ORDER BY IDTransaction DESC LIMIT 1;
+
+end
+------------------------------------------------
+CREATE TRIGGER `CopyTransaction` AFTER INSERT ON `AccountBalance`
+ FOR EACH ROW BEGIN
+
+INSERT INTO AccountTransactionHistory (IDTransaction, Date, username, stockID, typeTransaction, Debit, Credit, Unit, Balance) select AccountTransaction.IDTransaction, AccountTransaction.Date, AccountTransaction.username, AccountTransaction.stockID, AccountTransaction.typeTransaction, AccountTransaction.Debit, AccountTransaction.Credit, AccountTransaction.Unit, AccountBalance.balanceStart from AccountTransaction, AccountBalance where AccountTransaction.username=new.username and AccountTransaction.stockID=new.stockID ORDER BY IDTransaction DESC LIMIT 1;
+
+end
+------------------------------------------
+BEGIN
+
+SELECT PriceNAB into @NABunit FROM stockProduct where stockID=stockIDIN;
+
+INSERT INTO AccountBalance SET
+username = usernameIN, stockID=stockIDIN, balanceStart=DebitIN, stockNABunit=DebitIN/@NABunit
+ ON DUPLICATE KEY UPDATE balanceStart=balanceStart+DebitIN, stockNABunit=stockNABunit+(DebitIN/@NABunit);
+ 
+ update stockProduct SET
+ stockProduct.availableTotalNAB = stockProduct.availableTotalNAB - (DebitIN/@NABunit) where stockID=stockIDIN;
+ 
+ SELECT balanceStart into @balance FROM AccountBalance where username=usernameIN and stockID=stockIDIN;
+
+INSERT INTO `AccountTransaction` (`IDTransaction`, `Date`, `username`, `stockID`, `Balance`, `typeTransaction`, `Debit`, `Credit`, `Unit`) VALUES (NULL, CURRENT_DATE(), usernameIN, stockIDIN, @balance, b'1', DebitIN, '0', DebitIN/@NABunit)
+
+END
+----------------------------------------------------------
+CREATE PROCEDURE BuyStock(usernameIN varchar(20), stockIDIN varchar(20),DebitIN int)
+      BEGIN
+        declare priceNABunit INT;
+        declare NABunit INT;
+
+        SET priceNABunit =  (SELECT PriceNAB FROM stockProduct where stockID=stockIDIN);
+        SET NABunit = DebitIN/priceNABunit;
+        
+        INSERT INTO AccountBalance SET username = usernameIN, stockID=stockIDIN, balanceStart=DebitIN, stockNABunit=NABunit
+            ON DUPLICATE KEY UPDATE balanceStart=balanceStart+DebitIN, stockNABunit=stockNABunit+NABunit;
+
+        Update stockProduct SET availableTotalNAB = availableTotalNAB NABunit where stockID=stockIDIN;
+         
+        INSERT INTO AccountTransaction (IDTransaction, Date, username, stockID, Balance, typeTransaction, Debit, Credit, Unit) VALUES (NULL, CURRENT_DATE(), usernameIN, stockIDIN, @balance, b'1', DebitIN, '0', NABunit)
+
+         INSERT INTO DemoTable(StudentFirstName) VALUES(name);
+         INSERT INTO DemoTable2(ClientName,ClientAge) VALUES(name,age);
+      END
+      ==================================================
+
+      BEGIN
+    DECLARE priceNAB INT;
+    DECLARE NABunit INT;
+    DECLARE BalanceTrans INT;
+ 
+ 
+    SET priceNAB =  (SELECT PriceNAB FROM stockProduct where stockID=stockIDIN);
+    SET NABunit = DebitIN/priceNAB;
+                
+INSERT INTO AccountBalance SET username = usernameIN, stockID=stockIDIN, balanceStart=DebitIN, stockNABunit=NABunit ON DUPLICATE KEY UPDATE balanceStart=balanceStart+DebitIN, stockNABunit=stockNABunit+NABunit;
+
+
+Update stockProduct SET availableTotalNAB = availableTotalNAB-NABunit where stockID=stockIDIN;
+	SET BalanceTrans = (SELECT balanceStart FROM accountbalance where stockID=stockIDIN);
+
+INSERT INTO AccountTransaction SET Date= getDate(), username = usernameIN, stockID=stockIDIN, Balance=BalanceTrans, typeTransaction = b'1', Debit=DebitIN, Credit='0', Unit=NABunit;
+
+
+  
+END
+CALL buyStock('rakadprakoso','stk00001','200000')
+
+INSERT INTO AccountTransaction SET Date= CURDATE(), accounttransaction.username = usernameIN, stockID=stockIDIN, Balance=@BalanceTrans, typeTransaction = b'1', Debit=DebitIN, Credit='0', Unit=@NABunit;
