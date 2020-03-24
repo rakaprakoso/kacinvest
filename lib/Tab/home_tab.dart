@@ -363,7 +363,7 @@ ListView _activityList() {
             'Mandiri Syariah Reksa Dana',
             style: TextStyle(
               fontFamily: "worksans",
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w300,
               color: Colors.black),
           ),
           subtitle: Text(
