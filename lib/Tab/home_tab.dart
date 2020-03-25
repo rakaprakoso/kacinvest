@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:kacinvest/src/data/API.dart';
@@ -15,32 +14,28 @@ import 'package:kacinvest/util.dart';
 import 'package:kacinvest/Tab/profile.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeTab extends StatefulWidget {
   @override
   _HomeTabState createState() => _HomeTabState();
 }
 
-class CardData {
-  static double topPositioned = 700;
-  static double height = 0;
-  static double width = 0;
-  static bool showBackOfCard = false;
-  static String oneAsString = topPositioned.toString();
-  static double widthScreen = MediaQuery.of(context).size.width;
-
-  static BuildContext context;
-}
 
 class _HomeTabState extends State<HomeTab> {
-  var height = CardData.height;
-  var topPositioned = CardData.topPositioned;
-  var width = CardData.width;
-  var showBackOfCard = CardData.showBackOfCard;
-  var oneAsString = CardData.oneAsString;
-
   static var _isLoading = false;
   static var data;
+  static String _username = '';
+
+
+  _panggil() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var _username = prefs.getString('username');
+  print(_username);
+  setState(() => _username = '$_username');
+}
+
+
 
   Future<String> _ShowDialog(String msg) async {
     return showDialog<String>(
@@ -71,6 +66,7 @@ class _HomeTabState extends State<HomeTab> {
   }
 
   List<StockProduct> _stockproducts;
+
   _getStockProducts() {
     Services.getStockProducts().then((StockProduct) {
       setState(() {
@@ -102,6 +98,7 @@ class _HomeTabState extends State<HomeTab> {
     _getData();
     _getStockProducts();
     _stockproducts = [];
+     _panggil();
   }
 
   @override
@@ -125,6 +122,7 @@ class _HomeTabState extends State<HomeTab> {
 }
 
 Container _headerCard(context) {
+  var _username = _HomeTabState._username;
   final _media = MediaQuery.of(context).size;
   return Container(
     color: Colors.grey.shade50,
@@ -217,7 +215,7 @@ Container _headerCard(context) {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10),
                     child: Text(
-                      "Overview",
+                      _username,
                       style: TextStyle(
                           fontSize: _media.longestSide <= 775 ? 35 : 40,
                           color: Colors.white,
@@ -236,6 +234,7 @@ Container _headerCard(context) {
 }
 
 Container _paypalCard(context) {
+var _username = _HomeTabState._username;
   return Container(
     margin: EdgeInsets.all(15),
     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 11),
@@ -350,7 +349,7 @@ Container _paypalCard(context) {
                 color: PaypalColors.LightGrey,
                 textColor: PaypalColors.DarkBlue,
                 child: Text(
-                  "MR.RAKA D PRAKOSO",
+                  _username,
                   style: TextStyle(
                       fontFamily: "worksans",
                       color: PaypalColors.DarkBlue,
@@ -423,50 +422,50 @@ ListView _activityList() {
     padding: EdgeInsets.all(15),
     children: <Widget>[
       Container(
-        margin: EdgeInsets.only(bottom: 15),
+        margin: EdgeInsets.only(bottom: 5, top:5),
         decoration: _tileDecoration(),
         child: ListTile(
-          leading: Image.asset('assets/images/Nike.png'),
+          leading: Image.asset('assets/images/users/Bank_Syariah_Mandiri.png', width : 60),
           title: Text(
-            'Nike Medieval',
+            'Mandiri Syariah',
             style: TextStyle(
                 fontFamily: "worksans",
                 fontWeight: FontWeight.w500,
                 color: Colors.black),
           ),
           subtitle: Text(
-            'Jan 21, 2019',
+            'Mar 24, 2020',
             style:
                 TextStyle(fontFamily: "worksans", fontWeight: FontWeight.w300),
           ),
           trailing: Text(
-            '-249,99 USD',
+            '+200.000 IDR',
             style: TextStyle(fontFamily: "worksans"),
           ),
         ),
       ),
       Container(
-        margin: EdgeInsets.only(bottom: 15),
+        margin: EdgeInsets.only(bottom: 5),
         decoration: _tileDecoration(),
         child: ListTile(
           leading: Container(
-            width: 42,
-            child: Image.asset('assets/images/if_9_avatar_2754584.png'),
+            width: 60,
+            child: Image.asset('assets/images/users/Avrist.png'),
           ),
           title: Text(
-            'Lagertha Lothbrok',
+            'Avrist Equity - Cross Sectoral',
             style: TextStyle(
                 fontFamily: "worksans",
                 fontWeight: FontWeight.w500,
                 color: Colors.black),
           ),
           subtitle: Text(
-            'Jan 18, 2019',
+            'Mar 16, 2020',
             style:
                 TextStyle(fontFamily: "worksans", fontWeight: FontWeight.w300),
           ),
           trailing: Text(
-            '+102,00 USD',
+            '+150.000 IDR',
             style: TextStyle(fontFamily: "worksans"),
           ),
         ),
@@ -475,35 +474,25 @@ ListView _activityList() {
         margin: EdgeInsets.only(bottom: 15),
         decoration: _tileDecoration(),
         child: ListTile(
-          leading: ClipOval(
-            child: Container(
-              color: PaypalColors.LightBlue,
-              child: Image.asset(
-                "assets/images/icon_shop.png",
-                fit: BoxFit.scaleDown,
-                width: 35.0,
-                height: 35.0,
-              ),
-            ),
-          ),
+          leading: Image.asset('assets/images/users/Bank_Syariah_Mandiri.png', width : 60),
           title: Text(
-            'Spotify Finance Limited',
+            'Mandiri Syariah',
             style: TextStyle(
                 fontFamily: "worksans",
                 fontWeight: FontWeight.w500,
                 color: Colors.black),
           ),
           subtitle: Text(
-            'Jan 11, 2019',
+            'Feb 16, 2020',
             style:
                 TextStyle(fontFamily: "worksans", fontWeight: FontWeight.w300),
           ),
           trailing: Text(
-            '-9,99 USD',
+            '-50.000 IDR',
             style: TextStyle(fontFamily: "worksans"),
           ),
         ),
-      ),
+        ),
     ],
   );
 }
