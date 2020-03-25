@@ -30,9 +30,9 @@ class _HomeTabState extends State<HomeTab> {
 
   _panggil() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  var _username = prefs.getString('username');
-  print(_username);
-  setState(() => _username = '$_username');
+  var username = prefs.getString('username');
+  print(username);
+  setState(() => _username = '$username');
 }
 
 
