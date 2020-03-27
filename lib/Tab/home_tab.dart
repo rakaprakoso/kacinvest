@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:flutter_money_formatter/flutter_money_formatter.dart';
+import 'package:intl/intl.dart';
 import 'package:kacinvest/src/data/API.dart';
 import 'package:kacinvest/src/data/data.dart';
 import 'package:kacinvest/src/data/datadb.dart';
@@ -28,6 +29,8 @@ class _HomeTabState extends State<HomeTab> {
   static var data;
   static var profile;
   static var transactions;
+  static var balance;
+  static var currentbalance, currentbalancestart, returnbalance;
   static String _username = '';
 
   _panggil() async {
@@ -101,6 +104,42 @@ class _HomeTabState extends State<HomeTab> {
     }
   }
 
+  _balanceModel() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var username = prefs.getString('username');
+    final url =
+        "http://kacinvest.arkeyproject.com/try/Balance.php?username=$username";
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final _balance = json.decode(response.body);
+
+      setState(() {
+        _isLoading = true;
+        balance = _balance;
+        print(balance);
+        print(balance.length);
+      });
+    }
+  }
+
+  _balanceCalc() async {
+    setState(() {
+      currentbalancestart = returnbalance = currentbalance = 0;
+      int i = 0;
+
+      while (i < balance.length) {
+        currentbalancestart += balance[i]["balanceStart"];
+        currentbalance += (balance[i]["stockNABunit"] * balance[i]["priceNAB"]);
+        returnbalance = currentbalance - currentbalancestart;
+        i++;
+      }
+
+      print("Current balance start : $currentbalancestart");
+      print("Current balance : $currentbalance");
+      print("Current return balance : $returnbalance");
+    });
+  }
+
   Future<String> _ShowDialog(String msg) async {
     return showDialog<String>(
       context: context,
@@ -165,6 +204,8 @@ class _HomeTabState extends State<HomeTab> {
     _panggil();
     _profileModel();
     _transactionModel();
+    _balanceModel();
+    _balanceCalc();
   }
 
   @override
@@ -188,8 +229,25 @@ class _HomeTabState extends State<HomeTab> {
 }
 
 Container _headerCard(context) {
+  var balance = _HomeTabState.balance;
+
+  var currentbalance, currentbalancestart, returnbalance;
+  currentbalancestart = returnbalance = currentbalance = 0;
+  int i = 0;
+  int j = int.parse(balance[i]["stockNABunit"]);
+  int k = int.parse(balance[i]["priceNAB"]);
+
+  while (i < balance.length) {
+    currentbalancestart += int.parse(balance[i]["balanceStart"]);
+    currentbalance += (j * k);
+    returnbalance = currentbalance - currentbalancestart;
+    i++;
+  }
+
   var _username = _HomeTabState._username;
   var profile = _HomeTabState.profile;
+  final oCcy = new NumberFormat("#,##0", "en_US");
+
   final _media = MediaQuery.of(context).size;
   return Container(
     color: Colors.grey.shade50,
@@ -356,7 +414,8 @@ Container _headerCard(context) {
                                           ),
                                           SizedBox(width: 13),
                                           Text(
-                                            '2.120.000',
+                                            oCcy.format(currentbalance),
+                                            //"$currentbalance",
                                             style: TextStyle(
                                                 fontFamily: "sfprotext",
                                                 fontSize: 35),
@@ -392,7 +451,7 @@ Container _headerCard(context) {
                                           ),
                                           SizedBox(width: 13),
                                           Text(
-                                            '300.000',
+                                            '$returnbalance',
                                             style: TextStyle(
                                                 fontFamily: "sfprotext",
                                                 fontSize: 30),
@@ -421,9 +480,9 @@ Container _headerCard(context) {
                                       textColor: PaypalColors.DarkBlue,
                                       child: Text(
                                         //"Rala",
-                                        profile[1]["firstName"] +
+                                        profile[0]["firstName"] +
                                             " " +
-                                            profile[1]["lastName"],
+                                            profile[0]["lastName"],
                                         style: TextStyle(
                                             fontFamily: "worksans",
                                             color: PaypalColors.DarkBlue,
@@ -475,7 +534,7 @@ Container _headerCard(context) {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10),
                     child: Text(
-                      _username,
+                      "Hi, "+_username,
                       style: TextStyle(
                           fontSize: _media.longestSide <= 775 ? 35 : 40,
                           color: Colors.white,
@@ -711,7 +770,7 @@ Container _activityList(context) {
                   amountColor = Colors.green;
                 } else {
                   //amount = "- " + transactions[index]["Credit"];
-                                    var long2 = double.parse(transactions[index]["Credit"]);
+                  var long2 = double.parse(transactions[index]["Credit"]);
                   FlutterMoneyFormatter fmf = FlutterMoneyFormatter(
                       amount: long2,
                       settings: MoneyFormatterSettings(
@@ -725,7 +784,6 @@ Container _activityList(context) {
                   amount = "- " + fo.symbolOnLeft;
                   amountColor = Colors.red;
                 }
-                
 
                 return Container(
                   margin: EdgeInsets.only(bottom: 5, top: 5),
@@ -747,7 +805,8 @@ Container _activityList(context) {
                     ),
                     trailing: Text(
                       amount,
-                      style: TextStyle(fontFamily: "worksans", color: amountColor),
+                      style:
+                          TextStyle(fontFamily: "worksans", color: amountColor),
                     ),
                   ),
                 );
