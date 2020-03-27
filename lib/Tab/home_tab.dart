@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
+import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 import 'package:kacinvest/src/data/API.dart';
 import 'package:kacinvest/src/data/data.dart';
 import 'package:kacinvest/src/data/datadb.dart';
@@ -19,23 +20,86 @@ import 'package:shared_preferences/shared_preferences.dart';
 class HomeTab extends StatefulWidget {
   @override
   _HomeTabState createState() => _HomeTabState();
+  static var profile = _HomeTabState.profile;
 }
-
 
 class _HomeTabState extends State<HomeTab> {
   static var _isLoading = false;
   static var data;
+  static var profile;
+  static var transactions;
   static String _username = '';
 
-
   _panggil() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  var username = prefs.getString('username');
-  print(username);
-  setState(() => _username = '$username');
-}
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var username = prefs.getString('username');
+    print(username);
+    setState(() => _username = '$username');
+  }
 
+  FlutterMoneyFormatter fmf = new FlutterMoneyFormatter(
+      amount: 12345678.9012345,
+      settings: MoneyFormatterSettings(
+        symbol: 'IDR',
+        thousandSeparator: '.',
+        decimalSeparator: ',',
+        symbolAndNumberSeparator: ' ',
+        fractionDigits: 3,
+      ));
 
+/* Future<List> ProfileModel async {
+
+    var data = await http.get("http://kacinvest.arkeyproject.com/try/Profile.php");
+
+    var jsonData = json.decode(data.body);
+
+    List<ProfileModel> profiles = [];
+
+    for(var u in jsonData){
+
+      ProfileModel profile = ProfileModel(u["username"], u["referralCode"], u["firstName"], u["lastName"], u["bornDate"], u["email"], u["phoneNumber"], u["address"], u["bankAccountNumber"]);
+
+      profiles.add(profile);
+
+    }
+
+    print(profiles.length);
+
+    return profiles;
+
+  }*/
+  _profileModel() async {
+    final url = "http://kacinvest.arkeyproject.com/try/Profile.php";
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final profiles = json.decode(response.body);
+
+      setState(() {
+        _isLoading = true;
+        profile = profiles;
+        print(profile);
+        print(profile.length);
+      });
+    }
+  }
+
+  _transactionModel() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var username = prefs.getString('username');
+    final url =
+        "http://kacinvest.arkeyproject.com/try/Transactions.php?username=$username";
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final transaction = json.decode(response.body);
+
+      setState(() {
+        _isLoading = true;
+        transactions = transaction;
+        print(transactions);
+        print(transactions.length);
+      });
+    }
+  }
 
   Future<String> _ShowDialog(String msg) async {
     return showDialog<String>(
@@ -98,7 +162,9 @@ class _HomeTabState extends State<HomeTab> {
     _getData();
     _getStockProducts();
     _stockproducts = [];
-     _panggil();
+    _panggil();
+    _profileModel();
+    _transactionModel();
   }
 
   @override
@@ -114,7 +180,7 @@ class _HomeTabState extends State<HomeTab> {
           _choiceText(),
           _carousel(context),
           _activityText(),
-          _activityList(),
+          _activityList(context),
         ],
       ),
     );
@@ -123,6 +189,7 @@ class _HomeTabState extends State<HomeTab> {
 
 Container _headerCard(context) {
   var _username = _HomeTabState._username;
+  var profile = _HomeTabState.profile;
   final _media = MediaQuery.of(context).size;
   return Container(
     color: Colors.grey.shade50,
@@ -175,26 +242,219 @@ Container _headerCard(context) {
               onNotification: (overscroll) {
                 overscroll.disallowGlow();
               },
-              child: ListView.builder(
-                physics: BouncingScrollPhysics(),
-                padding: EdgeInsets.only(bottom: 10),
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
-                itemCount: getCreditCards().length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.only(right: 10),
-                    child: GestureDetector(
-                      /*onTap: () => Navigator.push(
+              child: Padding(
+                padding: EdgeInsets.only(right: 10),
+                child: GestureDetector(
+                  /*onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => OverviewPage())),*/
-                      child: CreditCardHome(
-                        card: getCreditCards()[index],
+                  child: Material(
+                    elevation: 1,
+                    shadowColor: Colors.grey.shade300,
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Stack(
+                      children: <Widget>[
+                        Container(
+                          width: _media.width - 40,
+                          //height: 284,
+                          padding: EdgeInsets.only(
+                            left: 30,
+                            right: 30,
+                            top: 30,
+                            bottom: 30,
+                          ),
+                          /*child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  "Card no.",
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                Text(
+                  card.cardNo,
+                  style: Theme.of(context).textTheme.headline.copyWith(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "Expires",
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey.shade400,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  );
-                },
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(card.expiryDate,
+                        style: Theme.of(context).textTheme.headline.copyWith(
+                              color: Colors.black.withOpacity(0.5),
+                              fontWeight: FontWeight.bold,
+                            ))
+                  ],
+                )
+              ],
+            ),*/
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Row(
+                                    children: <Widget>[
+                                      Image.asset(
+                                          'assets/images/Paypal-logo.png',
+                                          height: 30),
+                                      SizedBox(width: 20),
+                                      Text(
+                                        'BALANCE',
+                                        style: TextStyle(
+                                            color: PaypalColors.DarkBlue,
+                                            fontFamily: "worksans",
+                                            fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                  Icon(Icons.info_outline, size: 18)
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Image.asset('assets/images/chip_thumb.png'),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: <Widget>[
+                                      Row(
+                                        children: <Widget>[
+                                          Text(
+                                            '\IDR',
+                                            style: TextStyle(
+                                                fontFamily: "vistolsans",
+                                                fontSize: 25),
+                                          ),
+                                          SizedBox(width: 13),
+                                          Text(
+                                            '2.120.000',
+                                            style: TextStyle(
+                                                fontFamily: "sfprotext",
+                                                fontSize: 35),
+                                          ),
+                                          SizedBox(width: 0),
+                                        ],
+                                      ),
+                                      Text(
+                                        'My Investation',
+                                        style: TextStyle(
+                                            fontFamily: "worksans",
+                                            color: PaypalColors.Grey,
+                                            fontSize: 17),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: <Widget>[
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: <Widget>[
+                                      Row(
+                                        children: <Widget>[
+                                          Text(
+                                            'IDR',
+                                            style: TextStyle(
+                                                fontFamily: "vistolsans",
+                                                fontSize: 15),
+                                          ),
+                                          SizedBox(width: 13),
+                                          Text(
+                                            '300.000',
+                                            style: TextStyle(
+                                                fontFamily: "sfprotext",
+                                                fontSize: 30),
+                                          ),
+                                          SizedBox(width: 0),
+                                        ],
+                                      ),
+                                      Text(
+                                        'Return',
+                                        style: TextStyle(
+                                            fontFamily: "worksans",
+                                            color: PaypalColors.Grey,
+                                            fontSize: 17),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              Row(
+                                children: <Widget>[
+                                  SizedBox(
+                                    height: 25,
+                                    child: FlatButton(
+                                      color: PaypalColors.LightGrey,
+                                      textColor: PaypalColors.DarkBlue,
+                                      child: Text(
+                                        //"Rala",
+                                        profile[1]["firstName"] +
+                                            " " +
+                                            profile[1]["lastName"],
+                                        style: TextStyle(
+                                            fontFamily: "worksans",
+                                            color: PaypalColors.DarkBlue,
+                                            fontSize: 12),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute<Null>(
+                                            builder: (BuildContext context) {
+                                              return Profile();
+                                            },
+                                            fullscreenDialog: true,
+                                          ),
+                                        );
+                                      },
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
+                                      ),
+                                    ),
+                                  ),
+                                  Spacer()
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -234,7 +494,7 @@ Container _headerCard(context) {
 }
 
 Container _paypalCard(context) {
-var _username = _HomeTabState._username;
+  var _username = _HomeTabState._username;
   return Container(
     margin: EdgeInsets.all(15),
     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 11),
@@ -415,17 +675,91 @@ Container _activityText() {
   );
 }
 
-ListView _activityList() {
-  return ListView(
-    shrinkWrap: true,
-    physics: ClampingScrollPhysics(),
-    padding: EdgeInsets.all(15),
-    children: <Widget>[
+Container _activityList(context) {
+  var transactions = _HomeTabState.transactions;
+  var _isLoading = _HomeTabState._isLoading;
+  final _media = MediaQuery.of(context).size;
+  var amount, amountColor;
+
+  return Container(
+    child: NotificationListener<OverscrollIndicatorNotification>(
+      onNotification: (overscroll) {
+        overscroll.disallowGlow();
+      },
+      child: !_isLoading
+          ? new CircularProgressIndicator()
+          : ListView.builder(
+              itemCount: transactions.length,
+              shrinkWrap: true,
+              physics: ClampingScrollPhysics(),
+              padding: EdgeInsets.all(15),
+              itemBuilder: (BuildContext context, int index) {
+                if (transactions[index]["typeTransaction"] == '1') {
+                  //amount = "+ " + transactions[index]["Debit"];
+                  var long2 = double.parse(transactions[index]["Debit"]);
+                  FlutterMoneyFormatter fmf = FlutterMoneyFormatter(
+                      amount: long2,
+                      settings: MoneyFormatterSettings(
+                        symbol: 'IDR',
+                        thousandSeparator: '.',
+                        decimalSeparator: ',',
+                        symbolAndNumberSeparator: ' ',
+                        fractionDigits: 0,
+                      ));
+                  MoneyFormatterOutput fo = fmf.output;
+                  amount = "+ " + fo.symbolOnLeft;
+                  amountColor = Colors.green;
+                } else {
+                  //amount = "- " + transactions[index]["Credit"];
+                                    var long2 = double.parse(transactions[index]["Credit"]);
+                  FlutterMoneyFormatter fmf = FlutterMoneyFormatter(
+                      amount: long2,
+                      settings: MoneyFormatterSettings(
+                        symbol: 'IDR',
+                        thousandSeparator: '.',
+                        decimalSeparator: ',',
+                        symbolAndNumberSeparator: ' ',
+                        fractionDigits: 0,
+                      ));
+                  MoneyFormatterOutput fo = fmf.output;
+                  amount = "- " + fo.symbolOnLeft;
+                  amountColor = Colors.red;
+                }
+                
+
+                return Container(
+                  margin: EdgeInsets.only(bottom: 5, top: 5),
+                  decoration: _tileDecoration(),
+                  child: ListTile(
+                    leading:
+                        Image.network(transactions[index]["logo"], width: 60),
+                    title: Text(
+                      transactions[index]["Name"],
+                      style: TextStyle(
+                          fontFamily: "worksans",
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black),
+                    ),
+                    subtitle: Text(
+                      transactions[index]["date2"],
+                      style: TextStyle(
+                          fontFamily: "worksans", fontWeight: FontWeight.w300),
+                    ),
+                    trailing: Text(
+                      amount,
+                      style: TextStyle(fontFamily: "worksans", color: amountColor),
+                    ),
+                  ),
+                );
+              },
+
+              /*children: <Widget>[
       Container(
-        margin: EdgeInsets.only(bottom: 5, top:5),
+        margin: EdgeInsets.only(bottom: 5, top: 5),
         decoration: _tileDecoration(),
         child: ListTile(
-          leading: Image.asset('assets/images/users/Bank_Syariah_Mandiri.png', width : 60),
+          leading: Image.asset('assets/images/users/Bank_Syariah_Mandiri.png',
+              width: 60),
           title: Text(
             'Mandiri Syariah',
             style: TextStyle(
@@ -474,7 +808,8 @@ ListView _activityList() {
         margin: EdgeInsets.only(bottom: 15),
         decoration: _tileDecoration(),
         child: ListTile(
-          leading: Image.asset('assets/images/users/Bank_Syariah_Mandiri.png', width : 60),
+          leading: Image.asset('assets/images/users/Bank_Syariah_Mandiri.png',
+              width: 60),
           title: Text(
             'Mandiri Syariah',
             style: TextStyle(
@@ -492,8 +827,10 @@ ListView _activityList() {
             style: TextStyle(fontFamily: "worksans"),
           ),
         ),
-        ),
-    ],
+      ),
+    ],*/
+            ),
+    ),
   );
 }
 

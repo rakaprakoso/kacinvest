@@ -1,19 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:kacinvest/Tab/home_tab.dart';
 import 'package:kacinvest/Tab/profile.dart';
 import 'package:kacinvest/src/models/credit_card_model.dart';
+import 'package:kacinvest/src/models/profile_model.dart';
 
 import '../../util.dart';
 
 class CreditCardHome extends StatelessWidget {
-  final CreditCardModel card;
+  var profile = HomeTab.profile;
+  //final CreditCardModel card;
+  @override
+  void initState() {
+    // TODO: implement initState
 
-  CreditCardHome({
-    Key key,
-    this.card
-  }): super(key: key);
+
+        print(profile);
+        print(profile.length);
+
+  }
+
+  
+
+
 
   @override
   Widget build(BuildContext context) {
+    var profile = HomeTab.profile;
     final _media = MediaQuery.of(context).size;
     return Material(
       elevation: 1,
@@ -169,7 +181,8 @@ class CreditCardHome extends StatelessWidget {
                         color: PaypalColors.LightGrey,
                         textColor: PaypalColors.DarkBlue,
                         child: Text(
-                          "MR.RAKA D PRAKOSO",
+                          //"Rala",
+                          profile,
                           style: TextStyle(
                             fontFamily: "worksans",
                             color: PaypalColors.DarkBlue,

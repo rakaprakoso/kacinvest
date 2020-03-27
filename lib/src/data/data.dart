@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:kacinvest/src/models/credit_card_model.dart';
 import 'package:kacinvest/src/models/payment_model.dart';
 import 'package:kacinvest/src/models/user_model.dart';
+import 'package:kacinvest/src/models/profile_model.dart';
+
 import 'package:http/http.dart' as http;
 
 import 'dart:convert';
@@ -61,3 +63,5 @@ List<PaymentModel> getPaymentsCard() {
 
   return paymentCards;
 }
+
+ 
