@@ -7,9 +7,11 @@ import 'package:kacinvest/src/data/API.dart';
 import 'package:kacinvest/src/data/data.dart';
 import 'package:kacinvest/src/data/datadb.dart';
 import 'package:kacinvest/src/data/services.dart';
+import 'package:kacinvest/src/models/topstock_model.dart';
 import 'package:kacinvest/src/models/user_model.dart';
 import 'package:kacinvest/src/widgets/credit_card.dart';
 import 'package:kacinvest/src/widgets/credit_cardHome.dart';
+import 'package:kacinvest/src/widgets/top_stock_card.dart';
 import 'package:kacinvest/src/widgets/user_card.dart';
 
 import 'package:kacinvest/util.dart';
@@ -36,7 +38,8 @@ class _HomeTabState extends State<HomeTab> {
   _panggil() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var username = prefs.getString('username');
-    print(username);
+    var otp = prefs.getString('OTP');
+    print("$username & $otp");
     setState(() => _username = '$username');
   }
 
@@ -72,7 +75,9 @@ class _HomeTabState extends State<HomeTab> {
 
   }*/
   _profileModel() async {
-    final url = "http://kacinvest.arkeyproject.com/try/Profile.php";
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var username = prefs.getString('username');
+    final url = "http://kacinvest.arkeyproject.com/try/Profile.php?username=$username";
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final profiles = json.decode(response.body);
@@ -98,8 +103,8 @@ class _HomeTabState extends State<HomeTab> {
       setState(() {
         _isLoading = true;
         transactions = transaction;
-        print(transactions);
-        print(transactions.length);
+        //print(transactions);
+        //print(transactions.length);
       });
     }
   }
@@ -116,8 +121,8 @@ class _HomeTabState extends State<HomeTab> {
       setState(() {
         _isLoading = true;
         balance = _balance;
-        print(balance);
-        print(balance.length);
+       // print(balance);
+       // print(balance.length);
       });
     }
   }
@@ -168,7 +173,7 @@ class _HomeTabState extends State<HomeTab> {
     );
   }
 
-  List<StockProduct> _stockproducts;
+  static List<StockProduct> _stockproducts;
 
   _getStockProducts() {
     Services.getStockProducts().then((StockProduct) {
@@ -176,6 +181,7 @@ class _HomeTabState extends State<HomeTab> {
         _stockproducts = StockProduct;
       }); // Reset the title...
       print("Length ${StockProduct.length}");
+      print("ISI ${StockProduct}");
     });
   }
 
@@ -188,8 +194,8 @@ class _HomeTabState extends State<HomeTab> {
       setState(() {
         _isLoading = true;
         data = users;
-        print(data);
-        print(data.length);
+        //print(data);
+        //print(data.length);
       });
     }
   }
@@ -205,7 +211,7 @@ class _HomeTabState extends State<HomeTab> {
     _profileModel();
     _transactionModel();
     _balanceModel();
-    _balanceCalc();
+    //_balanceCalc();
   }
 
   @override
@@ -219,7 +225,8 @@ class _HomeTabState extends State<HomeTab> {
           _headerCard(context),
           //_paypalCard(context),
           _choiceText(),
-          _carousel(context),
+          _topStock(),
+          //_carousel(context),
           _activityText(),
           _activityList(context),
         ],
@@ -416,6 +423,7 @@ Container _headerCard(context) {
                                           Text(
                                             oCcy.format(currentbalance),
                                             //"$currentbalance",
+                                            //"Duit",
                                             style: TextStyle(
                                                 fontFamily: "sfprotext",
                                                 fontSize: 35),
@@ -451,7 +459,9 @@ Container _headerCard(context) {
                                           ),
                                           SizedBox(width: 13),
                                           Text(
-                                            '$returnbalance',
+                                            //"DUITT",
+                                            oCcy.format(returnbalance),
+                                            //'$returnbalance',
                                             style: TextStyle(
                                                 fontFamily: "sfprotext",
                                                 fontSize: 30),
@@ -481,8 +491,9 @@ Container _headerCard(context) {
                                       child: Text(
                                         //"Rala",
                                         profile[0]["firstName"] +
-                                            " " +
-                                            profile[0]["lastName"],
+                                           " " +
+                                           profile[0]["lastName"],
+                                            //profile[0]["firstName"],
                                         style: TextStyle(
                                             fontFamily: "worksans",
                                             color: PaypalColors.DarkBlue,
@@ -1264,3 +1275,26 @@ Widget build(BuildContext context) {
     ),
   );
 }*/
+Container _topStock(){
+  var _isLoading = _HomeTabState._isLoading;
+  var data = _HomeTabState.data;
+  var _stockproducts= _HomeTabState._stockproducts;
+
+   return Container(
+     height: 170,
+     child: ListView.builder(
+       //itemCount: data.length,
+       itemCount: _stockproducts.length,
+       scrollDirection: Axis.horizontal,
+       itemBuilder: (context, index){
+         //var stock = data[index];
+         var stock = _stockproducts[index];
+         return ProductCard(
+           imgUrl: stock.logo,
+           name: stock.name,
+           //color: stock.name
+         );
+       },
+       ),
+   );
+}

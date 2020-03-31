@@ -47,7 +47,8 @@ class KacinvestApp extends StatelessWidget {
       //home: App(),
       home:  Scaffold(
         body : DoubleBackToCloseApp(
-          child: new App(),
+          //child: new App(),
+          child: new OTPScreenCheck(),
           snackBar: const SnackBar(
             content: Text('Tap back again to leave'),
         ),

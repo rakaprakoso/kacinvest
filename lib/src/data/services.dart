@@ -30,7 +30,6 @@ class Services {
   }
  
   static Future<List<StockProduct>> getStockProducts() async {
-    try {
       //var map = Map<String, dynamic>();
       //map['action'] = _GET_ALL_ACTION;
       final response = await http.post(ROOT);
@@ -38,12 +37,7 @@ class Services {
       if (200 == response.statusCode) {
         List<StockProduct> list = parseResponse(response.body);
         return list;
-      } else {
-        return List<StockProduct>();
       }
-    } catch (e) {
-      return List<StockProduct>(); // return an empty list on exception/error
-    }
   }
  
   static List<StockProduct> parseResponse(String responseBody) {

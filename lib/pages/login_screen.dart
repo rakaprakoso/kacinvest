@@ -48,6 +48,7 @@ class _LoginScreenState extends State<LoginScreen>
           SharedPreferences prefs = await SharedPreferences.getInstance();
           var _text = "Raka2";
           await prefs.setString('username', datauser[0]['username']);
+          await prefs.setString('OTP', datauser[0]['OTP']);
         }
 
         setState(() {
