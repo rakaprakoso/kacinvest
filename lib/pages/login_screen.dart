@@ -69,97 +69,7 @@ class _LoginScreenState extends State<LoginScreen>
     super.initState();
     //_simpan();
   }
-  /*var data;
-  Future<String> getLogin(String username) async {
-    var response = await http.get(
-        Uri.encodeFull(
-            "http://kacinvest.arkeyproject.com/try/Login.php?username=${username}"),
-        headers: {"Accept": "application/json"});
-
-    print(response.body);
-    setState(() {
-      //var convertDataToJson = json.decode(response.body);
-      //data = convertDataToJson['result'];
-      var data = json.decode(response.body);
-      print(data);
-    });
-  }
-
-      VerifData(String username, String password, var datadb) {
-
-      /*if (datadb['username'] == username) {
-        if (datadb['password'] == password) {
-          // Navigator.of(context).pushNamed("/seconds");
-
-          var route = new MaterialPageRoute(
-            builder: (BuildContext context) =>
-                //new App(idUser: data[0]['user_id'],firstname: data[0]['first_name'],lastname: data[0]['last_name'],username: data[0]['username'],),
-                new App()
-          );
-          Navigator.of(context).push(route);
-        } else {
-          onSignedInErrorPassword();
-        }
-      } else {
-        onSignedInErrorPseudo();
-      }*/
-                var route = new MaterialPageRoute(
-            builder: (BuildContext context) =>
-                //new App(idUser: data[0]['user_id'],firstname: data[0]['first_name'],lastname: data[0]['last_name'],username: data[0]['username'],),
-                new App()
-          );
-          Navigator.of(context).push(route);
-    }
-
-        void onSignedInErrorPassword() {
-      var alert = new AlertDialog(
-        title: new Text("Pseudo Error"),
-        content: new Text(
-            "There was an Password error signing in. Please try again."),
-      );
-      showDialog(context: context, child: alert);
-    }
-
-    /*********************Alert Dialog Pseudo******************************/
-    void onSignedInErrorPseudo() {
-      var alert = new AlertDialog(
-        title: new Text("Pseudo Error"),
-        content:
-            new Text("There was an Pseudo error signing in. Please try again."),
-      );
-      showDialog(context: context, child: alert);
-    }
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  bool _isLoading = false;
-
-  /*signIn(String username, pass) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    Map data = {'username': username, 'password': pass};
-    var jsonResponse = null;
-    var response = await http.post("http://kacinvest.arkeyproject.com/try/Account.php", body: data);
-    if (response.statusCode == 200) {
-      jsonResponse = json.decode(response.body);
-      if (jsonResponse != null) {
-        setState(() {
-          _isLoading = false;
-        });
-        sharedPreferences.setString("token", jsonResponse['token']);
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (BuildContext context) => App()),
-            (Route<dynamic> route) => false);
-      }
-    } else {
-      setState(() {
-        _isLoading = false;
-      });
-      print(response.body);
-    }
-  }*/*/
+  
 
   final TextEditingController usernameController = new TextEditingController();
   final TextEditingController passwordController = new TextEditingController();
@@ -804,28 +714,6 @@ class _LoginScreenState extends State<LoginScreen>
   Widget build(BuildContext context) {
     return Container(
         height: MediaQuery.of(context).size.height,
-//      child: new GestureDetector(
-//        onHorizontalDragStart: _onHorizontalDragStart,
-//        onHorizontalDragUpdate: _onHorizontalDragUpdate,
-//        onHorizontalDragEnd: _onHorizontalDragEnd,
-//        behavior: HitTestBehavior.translucent,
-//        child: Stack(
-//          children: <Widget>[
-//            new FractionalTranslation(
-//              translation: Offset(-1 - (scrollPercent / (1 / numCards)), 0.0),
-//              child: SignupPage(),
-//            ),
-//            new FractionalTranslation(
-//              translation: Offset(0 - (scrollPercent / (1 / numCards)), 0.0),
-//              child: HomePage(),
-//            ),
-//            new FractionalTranslation(
-//              translation: Offset(1 - (scrollPercent / (1 / numCards)), 0.0),
-//              child: LoginPage(),
-//            ),
-//          ],
-//        ),
-//      ),
         child: PageView(
           controller: _controller,
           physics: new AlwaysScrollableScrollPhysics(),

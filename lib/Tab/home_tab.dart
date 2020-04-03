@@ -74,10 +74,97 @@ class _HomeTabState extends State<HomeTab> {
     return profiles;
 
   }*/
+
+  _gettingdata() async {
+    var profiles;
+    var transaction;
+    var _balance;
+    var users;
+
+    //ProfileModel
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var username = prefs.getString('username');
+    final url =
+        "http://kacinvest.arkeyproject.com/try/Profile.php?username=$username";
+    final response = await http.get(url);
+    if (response.statusCode == 200) profiles = json.decode(response.body);
+
+    //Transaction Model
+    final url1 =
+        "http://kacinvest.arkeyproject.com/try/Transactions.php?username=$username";
+    final response1 = await http.get(url1);
+    if (response1.statusCode == 200) transaction = json.decode(response1.body);
+
+    //Balance Model
+    final url2 =
+        "http://kacinvest.arkeyproject.com/try/Balance.php?username=$username";
+    final response2 = await http.get(url2);
+    if (response2.statusCode == 200) _balance = json.decode(response2.body);
+/*
+//Get Data
+    final url3 = "http://kacinvest.arkeyproject.com/try/SelectAllUsers.php";
+    final response3 = await http.get(url3);
+    if (response3.statusCode == 200) final users = json.decode(response.body);
+
+//Get Stock Product
+    Services.getStockProducts().then((StockProduct) {
+      setState(() {
+        _stockproducts = StockProduct;
+        //profilemodel
+        profile = profiles;
+        print(profile);
+        print(profile.length);
+        //Transaction
+        transactions = transaction;
+        //Balance
+        balance = _balance;
+        //Stock
+
+        data = users;
+        _isLoading = true;
+      }); // Reset the title...
+      print("Length ${StockProduct.length}");
+      print("ISI ${StockProduct}");
+    });*/
+    setState(() {
+      //_stockproducts = StockProduct;
+      //profilemodel
+      profile = profiles;
+      print(profile);
+      print(profile.length);
+      //Transaction
+      transactions = transaction;
+      print(transactions);
+      print(transactions.length);
+      //Balance
+      balance = _balance;
+      currentbalancestart = returnbalance = currentbalance = 0;
+      int i = 0;
+      int j = int.parse(balance[i]["stockNABunit"]);
+      int k = int.parse(balance[i]["priceNAB"]);
+
+      while (i < balance.length) {
+        currentbalancestart += int.parse(balance[i]["balanceStart"]);
+        currentbalance += (j * k);
+        returnbalance = currentbalance - currentbalancestart;
+        i++;
+      }
+
+      print("Current balance start : $currentbalancestart");
+      print("Current balance : $currentbalance");
+      print("Current return balance : $returnbalance");
+      /*//Stock
+
+        data = users;*/
+      _isLoading = true;
+    }); // Reset the title...
+  }
+
   _profileModel() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var username = prefs.getString('username');
-    final url = "http://kacinvest.arkeyproject.com/try/Profile.php?username=$username";
+    final url =
+        "http://kacinvest.arkeyproject.com/try/Profile.php?username=$username";
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final profiles = json.decode(response.body);
@@ -121,8 +208,23 @@ class _HomeTabState extends State<HomeTab> {
       setState(() {
         _isLoading = true;
         balance = _balance;
-       // print(balance);
-       // print(balance.length);
+        print(balance);
+        print(balance.length);
+        currentbalancestart = returnbalance = currentbalance = 0;
+        int i = 0;
+        int j = int.parse(balance[i]["stockNABunit"]);
+        int k = int.parse(balance[i]["priceNAB"]);
+
+        while (i < balance.length) {
+          currentbalancestart += int.parse(balance[i]["balanceStart"]);
+          currentbalance += (j * k);
+          returnbalance = currentbalance - currentbalancestart;
+          i++;
+        }
+
+        print("Current balance start : $currentbalancestart");
+        print("Current balance : $currentbalance");
+        print("Current return balance : $returnbalance");
       });
     }
   }
@@ -200,6 +302,12 @@ class _HomeTabState extends State<HomeTab> {
     }
   }
 
+  getSeafood() async {
+    var response = await http
+        .get("https://www.themealdb.com/api/json/v1/1/filter.php?c=Vegetarian");
+    return jsonDecode(response.body);
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -208,10 +316,13 @@ class _HomeTabState extends State<HomeTab> {
     _getStockProducts();
     _stockproducts = [];
     _panggil();
-    _profileModel();
-    _transactionModel();
-    _balanceModel();
+    //_profileModel();
+    //_transactionModel();
+    //_balanceModel();
     //_balanceCalc();
+    //_panggil();
+    //_balanceModel();
+    _gettingdata();
   }
 
   @override
@@ -220,25 +331,53 @@ class _HomeTabState extends State<HomeTab> {
   ) {
     final _media = MediaQuery.of(context).size;
     return SingleChildScrollView(
-      child: Column(
-        children: <Widget>[
-          _headerCard(context),
-          //_paypalCard(context),
-          _choiceText(),
-          _topStock(),
-          //_carousel(context),
-          _activityText(),
-          _activityList(context),
-        ],
-      ),
+      child: !_isLoading
+          ? new CircularProgressIndicator()
+          : Column(
+              children: <Widget>[
+                _headerCard(context),
+                //_paypalCard(context),
+                _choiceText(),
+                _topStock(),
+                //_carousel(context),
+                _activityText(),
+                //_activityList(context),
+                _activityListtt(context, _username),
+                
+                ],
+            ),
     );
   }
 }
 
 Container _headerCard(context) {
+  var _isLoading = _HomeTabState._isLoading;
   var balance = _HomeTabState.balance;
+  int currentbalance = _HomeTabState.currentbalance;
+  int currentbalancestart = _HomeTabState.currentbalancestart;
+  int returnbalance = _HomeTabState.returnbalance;
+  var amount;
+  var amount2;
+  var name;
+  var profile = _HomeTabState.profile;
+  int i, j;
+  if (currentbalance == null) {
+    i = 0;
+  } else {
+    i = currentbalance;
+  }
+  if (returnbalance == null) {
+    j = 0;
+  } else {
+    j = returnbalance;
+  }
+  if (profile == null) {
+    name = "Loading..";
+  } else {
+    name = profile[0]["firstName"] + " " + profile[0]["lastName"];
+  }
 
-  var currentbalance, currentbalancestart, returnbalance;
+  /*var currentbalance, currentbalancestart, returnbalance;
   currentbalancestart = returnbalance = currentbalance = 0;
   int i = 0;
   int j = int.parse(balance[i]["stockNABunit"]);
@@ -249,10 +388,36 @@ Container _headerCard(context) {
     currentbalance += (j * k);
     returnbalance = currentbalance - currentbalancestart;
     i++;
-  }
+  }*/
+  //var long2 = double.parse(currentbalance);
+  var long2 = i.toDouble();
+  var long3 = j.toDouble();
+  FlutterMoneyFormatter fmf = FlutterMoneyFormatter(
+      amount: long2,
+      settings: MoneyFormatterSettings(
+        symbol: 'IDR',
+        thousandSeparator: '.',
+        decimalSeparator: ',',
+        symbolAndNumberSeparator: ' ',
+        fractionDigits: 0,
+      ));
+  //MoneyFormatterOutput fo = fmf.output;
+  //amount = fo.nonSymbol;
+  amount = fmf
+      .copyWith(
+        amount: long2,
+      )
+      .output
+      .nonSymbol;
+  amount2 = fmf
+      .copyWith(
+        amount: long3,
+      )
+      .output
+      .compactNonSymbol;
 
   var _username = _HomeTabState._username;
-  var profile = _HomeTabState.profile;
+
   final oCcy = new NumberFormat("#,##0", "en_US");
 
   final _media = MediaQuery.of(context).size;
@@ -323,16 +488,18 @@ Container _headerCard(context) {
                     ),
                     child: Stack(
                       children: <Widget>[
-                        Container(
-                          width: _media.width - 40,
-                          //height: 284,
-                          padding: EdgeInsets.only(
-                            left: 30,
-                            right: 30,
-                            top: 30,
-                            bottom: 30,
-                          ),
-                          /*child: Column(
+                        !_isLoading
+                            ? new CircularProgressIndicator()
+                            : Container(
+                                width: _media.width - 40,
+                                //height: 284,
+                                padding: EdgeInsets.only(
+                                  left: 30,
+                                  right: 30,
+                                  top: 30,
+                                  bottom: 30,
+                                ),
+                                /*child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
@@ -377,150 +544,158 @@ Container _headerCard(context) {
                 )
               ],
             ),*/
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Row(
-                                    children: <Widget>[
-                                      Image.asset(
-                                          'assets/images/Paypal-logo.png',
-                                          height: 30),
-                                      SizedBox(width: 20),
-                                      Text(
-                                        'BALANCE',
-                                        style: TextStyle(
-                                            color: PaypalColors.DarkBlue,
-                                            fontFamily: "worksans",
-                                            fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                  Icon(Icons.info_outline, size: 18)
-                                ],
-                              ),
-                              SizedBox(height: 20),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Image.asset('assets/images/chip_thumb.png'),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: <Widget>[
-                                      Row(
-                                        children: <Widget>[
-                                          Text(
-                                            '\IDR',
-                                            style: TextStyle(
-                                                fontFamily: "vistolsans",
-                                                fontSize: 25),
-                                          ),
-                                          SizedBox(width: 13),
-                                          Text(
-                                            oCcy.format(currentbalance),
-                                            //"$currentbalance",
-                                            //"Duit",
-                                            style: TextStyle(
-                                                fontFamily: "sfprotext",
-                                                fontSize: 35),
-                                          ),
-                                          SizedBox(width: 0),
-                                        ],
-                                      ),
-                                      Text(
-                                        'My Investation',
-                                        style: TextStyle(
-                                            fontFamily: "worksans",
-                                            color: PaypalColors.Grey,
-                                            fontSize: 17),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                              SizedBox(height: 20),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: <Widget>[
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: <Widget>[
-                                      Row(
-                                        children: <Widget>[
-                                          Text(
-                                            'IDR',
-                                            style: TextStyle(
-                                                fontFamily: "vistolsans",
-                                                fontSize: 15),
-                                          ),
-                                          SizedBox(width: 13),
-                                          Text(
-                                            //"DUITT",
-                                            oCcy.format(returnbalance),
-                                            //'$returnbalance',
-                                            style: TextStyle(
-                                                fontFamily: "sfprotext",
-                                                fontSize: 30),
-                                          ),
-                                          SizedBox(width: 0),
-                                        ],
-                                      ),
-                                      Text(
-                                        'Return',
-                                        style: TextStyle(
-                                            fontFamily: "worksans",
-                                            color: PaypalColors.Grey,
-                                            fontSize: 17),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                              SizedBox(height: 20),
-                              Row(
-                                children: <Widget>[
-                                  SizedBox(
-                                    height: 25,
-                                    child: FlatButton(
-                                      color: PaypalColors.LightGrey,
-                                      textColor: PaypalColors.DarkBlue,
-                                      child: Text(
-                                        //"Rala",
-                                        profile[0]["firstName"] +
-                                           " " +
-                                           profile[0]["lastName"],
-                                            //profile[0]["firstName"],
-                                        style: TextStyle(
-                                            fontFamily: "worksans",
-                                            color: PaypalColors.DarkBlue,
-                                            fontSize: 12),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute<Null>(
-                                            builder: (BuildContext context) {
-                                              return Profile();
-                                            },
-                                            fullscreenDialog: true,
-                                          ),
-                                        );
-                                      },
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(30.0),
-                                      ),
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Row(
+                                          children: <Widget>[
+                                            Image.asset(
+                                                'assets/images/Paypal-logo.png',
+                                                height: 30),
+                                            SizedBox(width: 20),
+                                            Text(
+                                              'BALANCE',
+                                              style: TextStyle(
+                                                  color: PaypalColors.DarkBlue,
+                                                  fontFamily: "worksans",
+                                                  fontSize: 12),
+                                            ),
+                                          ],
+                                        ),
+                                        Icon(Icons.info_outline, size: 18)
+                                      ],
                                     ),
-                                  ),
-                                  Spacer()
-                                ],
+                                    SizedBox(height: 20),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Image.asset(
+                                            'assets/images/chip_thumb.png'),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: <Widget>[
+                                            Row(
+                                              children: <Widget>[
+                                                Text(
+                                                  '\IDR',
+                                                  style: TextStyle(
+                                                      fontFamily: "vistolsans",
+                                                      fontSize: 25),
+                                                ),
+                                                SizedBox(width: 13),
+                                                Text(
+                                                  "$amount",
+                                                  //oCcy.format(currentbalance),
+                                                  //"$currentbalance",
+                                                  //"Duit",
+                                                  style: TextStyle(
+                                                      fontFamily: "sfprotext",
+                                                      fontSize: 35),
+                                                ),
+                                                SizedBox(width: 0),
+                                              ],
+                                            ),
+                                            Text(
+                                              'My Investation',
+                                              style: TextStyle(
+                                                  fontFamily: "worksans",
+                                                  color: PaypalColors.Grey,
+                                                  fontSize: 17),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(height: 20),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: <Widget>[
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: <Widget>[
+                                            Row(
+                                              children: <Widget>[
+                                                Text(
+                                                  'IDR',
+                                                  style: TextStyle(
+                                                      fontFamily: "vistolsans",
+                                                      fontSize: 15),
+                                                ),
+                                                SizedBox(width: 13),
+                                                Text(
+                                                  //"DUITT",
+                                                  //oCcy.format(j),
+                                                  //'$returnbalance',
+                                                  "$amount2",
+                                                  style: TextStyle(
+                                                      fontFamily: "sfprotext",
+                                                      fontSize: 30),
+                                                ),
+                                                SizedBox(width: 0),
+                                              ],
+                                            ),
+                                            Text(
+                                              'Return',
+                                              style: TextStyle(
+                                                  fontFamily: "worksans",
+                                                  color: PaypalColors.Grey,
+                                                  fontSize: 17),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(height: 20),
+                                    Row(
+                                      children: <Widget>[
+                                        SizedBox(
+                                          height: 25,
+                                          child: FlatButton(
+                                            color: PaypalColors.LightGrey,
+                                            textColor: PaypalColors.DarkBlue,
+                                            child: Text(
+                                              "$name",
+                                              //"Rala",
+                                              //profile[0]["firstName"] +
+                                              // " " +
+                                              //  profile[0]["lastName"],
+                                              //profile[0]["firstName"],
+                                              style: TextStyle(
+                                                  fontFamily: "worksans",
+                                                  color: PaypalColors.DarkBlue,
+                                                  fontSize: 12),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute<Null>(
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return Profile();
+                                                  },
+                                                  fullscreenDialog: true,
+                                                ),
+                                              );
+                                            },
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(30.0),
+                                            ),
+                                          ),
+                                        ),
+                                        Spacer()
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -545,7 +720,7 @@ Container _headerCard(context) {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10),
                     child: Text(
-                      "Hi, "+_username,
+                      "Hi, " + _username,
                       style: TextStyle(
                           fontSize: _media.longestSide <= 775 ? 35 : 40,
                           color: Colors.white,
@@ -744,6 +919,106 @@ Container _activityText() {
     ),
   );
 }
+
+Container _activityListtt(context, username) {
+  getTransaction() async {
+    var response = await http
+        .get("http://kacinvest.arkeyproject.com/try/Transactions.php?username=$username");
+    return jsonDecode(response.body);
+  }
+
+  //var transactions = _HomeTabState.transactions;
+  var _isLoading = _HomeTabState._isLoading;
+  final _media = MediaQuery.of(context).size;
+  var amount, amountColor;
+
+  return Container(
+    child: NotificationListener<OverscrollIndicatorNotification>(
+      onNotification: (overscroll) {
+        overscroll.disallowGlow();
+      },
+      child: new FutureBuilder(
+                    future: getTransaction(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        print(snapshot.data);
+                        var transactions = snapshot.data;
+                        // tampilkan dvarata
+                        return        ListView.builder(
+              itemCount: transactions.length,
+              shrinkWrap: true,
+              physics: ClampingScrollPhysics(),
+              padding: EdgeInsets.all(15),
+              itemBuilder: (BuildContext context, int index) {
+                if (transactions[index]["typeTransaction"] == '1') {
+                  //amount = "+ " + transactions[index]["Debit"];
+                  var long2 = double.parse(transactions[index]["Debit"]);
+                  FlutterMoneyFormatter fmf = FlutterMoneyFormatter(
+                      amount: long2,
+                      settings: MoneyFormatterSettings(
+                        symbol: 'IDR',
+                        thousandSeparator: '.',
+                        decimalSeparator: ',',
+                        symbolAndNumberSeparator: ' ',
+                        fractionDigits: 0,
+                      ));
+                  MoneyFormatterOutput fo = fmf.output;
+                  amount = "+ " + fo.symbolOnLeft;
+                  amountColor = Colors.green;
+                } else {
+                  //amount = "- " + transactions[index]["Credit"];
+                  var long2 = double.parse(transactions[index]["Credit"]);
+                  FlutterMoneyFormatter fmf = FlutterMoneyFormatter(
+                      amount: long2,
+                      settings: MoneyFormatterSettings(
+                        symbol: 'IDR',
+                        thousandSeparator: '.',
+                        decimalSeparator: ',',
+                        symbolAndNumberSeparator: ' ',
+                        fractionDigits: 0,
+                      ));
+                  MoneyFormatterOutput fo = fmf.output;
+                  amount = "- " + fo.symbolOnLeft;
+                  amountColor = Colors.red;
+                }
+
+                return Container(
+                  margin: EdgeInsets.only(bottom: 5, top: 5),
+                  decoration: _tileDecoration(),
+                  child: ListTile(
+                    leading:
+                        Image.network(transactions[index]["logo"], width: 60),
+                    title: Text(
+                      transactions[index]["Name"],
+                      style: TextStyle(
+                          fontFamily: "worksans",
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black),
+                    ),
+                    subtitle: Text(
+                      transactions[index]["date2"],
+                      style: TextStyle(
+                          fontFamily: "worksans", fontWeight: FontWeight.w300),
+                    ),
+                    trailing: Text(
+                      amount,
+                      style:
+                          TextStyle(fontFamily: "worksans", color: amountColor),
+                    ),
+                  ),
+                );
+              },
+            );
+                        
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    },
+                  ),
+    ),
+  );
+}
+
 
 Container _activityList(context) {
   var transactions = _HomeTabState.transactions;
@@ -1275,26 +1550,28 @@ Widget build(BuildContext context) {
     ),
   );
 }*/
-Container _topStock(){
+Container _topStock() {
   var _isLoading = _HomeTabState._isLoading;
   var data = _HomeTabState.data;
-  var _stockproducts= _HomeTabState._stockproducts;
+  var _stockproducts = _HomeTabState._stockproducts;
 
-   return Container(
-     height: 170,
-     child: ListView.builder(
-       //itemCount: data.length,
-       itemCount: _stockproducts.length,
-       scrollDirection: Axis.horizontal,
-       itemBuilder: (context, index){
-         //var stock = data[index];
-         var stock = _stockproducts[index];
-         return ProductCard(
-           imgUrl: stock.logo,
-           name: stock.name,
-           //color: stock.name
-         );
-       },
-       ),
-   );
+  return Container(
+    height: 170,
+    child: !_isLoading
+        ? new CircularProgressIndicator()
+        : ListView.builder(
+            //itemCount: data.length,
+            itemCount: _stockproducts.length,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, index) {
+              //var stock = data[index];
+              var stock = _stockproducts[index];
+              return ProductCard(
+                imgUrl: stock.logo,
+                name: stock.name,
+                //color: stock.name
+              );
+            },
+          ),
+  );
 }

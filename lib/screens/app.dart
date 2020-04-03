@@ -3,6 +3,7 @@ import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
 import 'package:kacinvest/Tab/calculator_tab.dart';
 import 'package:kacinvest/Tab/profile.dart';
+import 'package:kacinvest/Tab/shop_tab.dart';
 import 'package:kacinvest/pages/login_screen.dart';
 import 'package:kacinvest/screens/first_tab.dart';
 import 'package:kacinvest/screens/account.dart';
@@ -82,7 +83,20 @@ class _MyHomePageState extends State<App> {
       children: <Widget>[
         Scaffold(
           //appBar: AppBar(title: Text("Nav Bar")),
-          appBar: _mainAppBar(),
+          appBar: PreferredSize(
+          child: Container(
+            decoration: BoxDecoration(boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                offset: Offset(0, 1.0),
+                blurRadius: 10.0,
+              )
+            ]),
+            child: _mainAppBar(),
+            ),
+          
+          preferredSize: Size.fromHeight(kToolbarHeight),
+          ),
           //backgroundColor: PaypalColors.LightOrange,
           body: DoubleBackToCloseApp(
             child: SizedBox.expand(
@@ -155,8 +169,8 @@ class _MyHomePageState extends State<App> {
           },
         ),
       ],
-      backgroundColor: Colors.transparent,
-      elevation: 0.0,
+      backgroundColor: Colors.white,
+      elevation: 10.0,
     );
   }
 
@@ -168,8 +182,9 @@ class _MyHomePageState extends State<App> {
       },
       children: <Widget>[
         HomeTab(),
+        ShopTab(),
         //OtpScreen(),
-        MarketTab(),
+        //MarketTab(),
         MyInvestment(),
         CalculatorTab(),
         Profile(),
