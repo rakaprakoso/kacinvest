@@ -1,10 +1,15 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_sparkline/flutter_sparkline.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:kacinvest/util.dart';
 import 'shop_items_page.dart';
 import '../custom_icon/spin_icons.dart';
 import '../custom_icon/kacinvest_icon_icons.dart';
+import 'package:kacinvest/StockCard/awesome_card.dart';
+import 'dart:math' as math;
+import 'dart:ui';
 
 class MyInvestment extends StatefulWidget {
   @override
@@ -419,7 +424,10 @@ class _MyInvestmentState extends State<MyInvestment> {
               */
               _balance(_media),
               _invest(),
-              HomeScreenBottomPart(),
+              /*StockCard(),
+              SlidingCardsView(),
+              
+              HomeScreenBottomPart(),*/
             ],
           ),
         ),
@@ -452,39 +460,79 @@ class _MyInvestmentState extends State<MyInvestment> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Center(
-                  child: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
-                child:
-                    //Icon(KacinvestIcon.up_circled, color: Colors.white, size: 40.0),
-                    Icon(Icons.arrow_upward, color: Colors.white, size: 40.0),
-              )),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
-                  Text('Balance',
+                  Text('Return',
                       style: TextStyle(
                         color: Colors.white70,
                         fontFamily: 'Montserrat',
-                        fontSize: 18.0,
+                        fontSize: 13.0,
                       )),
-                  Text('2.120.000 IDR',
+                  Text('2%',
                       style: TextStyle(
-                          decoration: TextDecoration.underline,
                           fontFamily: 'Montserrat',
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
-                          fontSize: 40.0)),
+                          fontSize: 24.0)),
+                ],
+              ),
+              Center(
+                  child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                child: Icon(KacinvestIcon.angle_double_up,
+                    color: Colors.white, size: 40.0),
+                //Icon(Icons.arrow_upward, color: Colors.white, size: 40.0),
+              )),
+              VerticalDivider(
+                indent: 20,
+                endIndent: 20,
+                thickness: 1,
+                color: Colors.white,
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text('Balance',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontFamily: 'Montserrat',
+                                fontSize: 18.0,
+                              )),
+                          Text('2.120.000 IDR',
+                              style: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 40.0)),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Divider(
+                    thickness: 2,
+                    color: Colors.white,
+                    height: 1,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: <Widget>[
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Text('Return',
                               style: TextStyle(
                                 color: Colors.white70,
                                 fontFamily: 'Montserrat',
@@ -492,18 +540,11 @@ class _MyInvestmentState extends State<MyInvestment> {
                               )),
                           Text('2.120.000 IDR',
                               style: TextStyle(
-                                  decoration: TextDecoration.underline,
                                   fontFamily: 'Montserrat',
                                   color: Colors.white,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 20.0)),
-                        ],
-                      ),
-                                            Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: <Widget>[
-                          Text('Balance',
+                          Text('Start Invest',
                               style: TextStyle(
                                 color: Colors.white70,
                                 fontFamily: 'Montserrat',
@@ -511,7 +552,6 @@ class _MyInvestmentState extends State<MyInvestment> {
                               )),
                           Text('2.120.000 IDR',
                               style: TextStyle(
-                                  decoration: TextDecoration.underline,
                                   fontFamily: 'Montserrat',
                                   color: Colors.white,
                                   fontWeight: FontWeight.w700,
@@ -520,7 +560,6 @@ class _MyInvestmentState extends State<MyInvestment> {
                       ),
                     ],
                   ),
-                  
                 ],
               ),
             ]),
@@ -536,35 +575,47 @@ class _MyInvestmentState extends State<MyInvestment> {
             topRight: const Radius.circular(30.0)),
         color: Colors.white,
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text('Investment Total',
-                      style: TextStyle(color: Colors.blueAccent)),
-                  Text('2.120.000 IDR',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 34.0))
-                ],
-              ),
-              Material(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.circular(24.0),
-                  child: Center(
-                      child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Icon(Icons.trending_up,
-                        color: Colors.white, size: 30.0),
-                  )))
-            ]),
+      child: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24.0, 24, 24, 0),
+            child: Column(
+              children: <Widget>[
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text('Reksa Dana \nProducts',
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 28.0))
+                        ],
+                      ),
+                      Material(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(24.0),
+                          child: Center(
+                              child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text('3',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'Montserrat',
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 24.0)),
+                          )))
+                    ]),
+              ],
+            ),
+          ),
+          StockCard(),
+        ],
       ),
     );
   }
@@ -663,6 +714,494 @@ class HomeScreenBottomPart extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+}
+
+class SlidingCardsView extends StatefulWidget {
+  @override
+  _SlidingCardsViewState createState() => _SlidingCardsViewState();
+}
+
+class _SlidingCardsViewState extends State<SlidingCardsView> {
+  int bottomSelectedIndex = 0;
+  PageController pageController = PageController(
+    initialPage: 0,
+    keepPage: true,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    pageController = PageController(viewportFraction: 0.8);
+  }
+
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
+  }
+
+  void pageChanged(int index) {
+    setState(() {
+      bottomSelectedIndex = index;
+    });
+  }
+
+  void bottomTapped(int index) {
+    setState(() {
+      bottomSelectedIndex = index;
+      pageController.animateToPage(index,
+          duration: Duration(milliseconds: 500), curve: Curves.ease);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        Container(
+          height: 400,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: PageView(
+              pageSnapping: false,
+              controller: pageController,
+              onPageChanged: (index) {
+                pageChanged(index);
+              },
+              children: <Widget>[
+                Balance(),
+                StockCard(),
+                SlidingCard(
+                  name: 'Shenzhen GLOBAL DESIGN AWARD 2018',
+                  date: '4.20-30',
+                  //assetName: 'steve-johnson.jpeg',
+                ),
+                SlidingCard(
+                  name: 'Dawan District, Guangdong Hong Kong and Macao',
+                  date: '4.28-31',
+                  //assetName: 'rodion-kutsaev.jpeg',
+                ),
+                SlidingCard(
+                  name: 'Dawan District, Guangdong Hong Kong and Macao',
+                  date: '4.28-31',
+                  //assetName: 'rodion-kutsaev.jpeg',
+                ),
+              ],
+            ),
+          ),
+        ),
+        Row(
+          children: <Widget>[
+            KeyboardNumber(
+              n: 1,
+              onPressed: () {
+                bottomTapped(0);
+              },
+            ),
+            KeyboardNumber(
+              n: 2,
+              onPressed: () {
+                bottomTapped(1);
+              },
+            ),
+            KeyboardNumber(
+              n: 3,
+              onPressed: () {
+                bottomTapped(2);
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class SlidingCard extends StatelessWidget {
+  final String name; //<-- title of the event
+  final String date; //<-- date of the event
+  // final String assetName; //<-- name of the image to be displayed
+
+  const SlidingCard({
+    Key key,
+    @required this.name,
+    @required this.date,
+    //@required this.assetName,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      //margin: EdgeInsets.only(left: 8, right: 8, bottom: 24),
+      elevation: 8,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(32)), //<--custom shape
+      child: Column(
+        children: <Widget>[
+          ClipRRect(
+            //<--clipping image
+            borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+            child: Image.asset(
+              //<-- main image
+              //'assets/$assetName',
+              "assets/images/BGStock2.jpg",
+              height: MediaQuery.of(context).size.height * 0.3,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(height: 8),
+          Expanded(
+            child: CardContent(
+              //<--replace the Container with CardContent
+              name: name,
+              date: date,
+            ), //<-- will be replaced soon :)
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CardContent extends StatelessWidget {
+  final String name;
+  final String date;
+
+  const CardContent({Key key, @required this.name, @required this.date})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(name, style: TextStyle(fontSize: 20)),
+          SizedBox(height: 8),
+          Text(date, style: TextStyle(color: Colors.grey)),
+          Spacer(),
+          Row(
+            children: <Widget>[
+              RaisedButton(
+                color: Color(0xFF162A49),
+                child: Text('Reserve'),
+                textColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32),
+                ),
+                onPressed: () {},
+              ),
+              Spacer(),
+              Text(
+                '0.00 \$',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              SizedBox(width: 16),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class KeyboardNumber extends StatelessWidget {
+  final int n;
+  final Function() onPressed;
+  KeyboardNumber({this.n, this.onPressed});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 60.0,
+      height: 60.0,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white.withOpacity(0.1),
+      ),
+      alignment: Alignment.center,
+      child: MaterialButton(
+        padding: EdgeInsets.all(8.0),
+        onPressed: onPressed,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(60.0),
+        ),
+        height: 90.0,
+        child: Text(
+          "$n",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 24 * MediaQuery.of(context).textScaleFactor,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class StockCard extends StatefulWidget {
+  StockCard({Key key, this.title}) : super(key: key);
+  final String title;
+
+  @override
+  _StockCardState createState() => _StockCardState();
+}
+
+class _StockCardState extends State<StockCard> {
+  String cardNumber = "INI BALANCE";
+  String cardHolderName = "RETURN";
+  String expiryDate = "";
+  String cvv = "";
+  bool showBack = false;
+
+  static FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = new FocusNode();
+    _focusNode.addListener(() {
+      setState(() {
+        _focusNode.hasFocus ? showBack = true : showBack = false;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(
+              height: 40,
+            ),
+            CreditCard(
+              cardNumber: "BALANCE",
+              cardExpiry: "expiryDate",
+              cardHolderName: "Raka D Prakoso",
+              cvv: cvv,
+              bankName: "Axis Bank",
+              showBackSide: showBack,
+              frontBackground: CardBackgrounds.white,
+              backBackground: CardBackgrounds.gray,
+              showShadow: true,
+            ),
+            SizedBox(
+              height: 40,
+            ),
+            /*
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+                  child: TextFormField(
+                    decoration: InputDecoration(hintText: "Card Number"),
+                    maxLength: 19,
+                    onChanged: (value) {
+                      setState(() {
+                        cardNumber = value;
+                      });
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+                  child: TextFormField(
+                    decoration: InputDecoration(hintText: "Card Expiry"),
+                    maxLength: 5,
+                    onChanged: (value) {
+                      setState(() {
+                        expiryDate = value;
+                      });
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+                  child: TextFormField(
+                    decoration: InputDecoration(hintText: "Card Holder Name"),
+                    onChanged: (value) {
+                      setState(() {
+                        cardHolderName = value;
+                      });
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+                  child: TextFormField(
+                    decoration: InputDecoration(hintText: "CVV"),
+                    maxLength: 3,
+                    onChanged: (value) {
+                      setState(() {
+                        cvv = value;
+                      });
+                    },
+                    focusNode: _focusNode,
+                  ),
+                ),
+              ],
+            )*/
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Balance extends StatelessWidget {
+  Widget _balance(_media) {
+    return Card(
+      child: Container(
+        height: _media.height * 0.3,
+        width: _media.width,
+        decoration: BoxDecoration(),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Text('Return',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontFamily: 'Montserrat',
+                          fontSize: 13.0,
+                        )),
+                    Text('2%',
+                        style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 24.0)),
+                  ],
+                ),
+                Center(
+                    child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                  child: Icon(KacinvestIcon.angle_double_up,
+                      color: Colors.white, size: 40.0),
+                  //Icon(Icons.arrow_upward, color: Colors.white, size: 40.0),
+                )),
+                VerticalDivider(
+                  indent: 20,
+                  endIndent: 20,
+                  thickness: 1,
+                  color: Colors.white,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text('Balance',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontFamily: 'Montserrat',
+                                  fontSize: 18.0,
+                                )),
+                            Text('2.120.000 IDR',
+                                style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 40.0)),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Divider(
+                      thickness: 2,
+                      color: Colors.white,
+                      height: 1,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            Text('Return',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontFamily: 'Montserrat',
+                                  fontSize: 14.0,
+                                )),
+                            Text('2.120.000 IDR',
+                                style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 20.0)),
+                            Text('Start Invest',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontFamily: 'Montserrat',
+                                  fontSize: 14.0,
+                                )),
+                            Text('2.120.000 IDR',
+                                style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 20.0)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ]),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final _media = MediaQuery.of(context).size;
+    return Container(
+      child: _balance(_media),
     );
   }
 }

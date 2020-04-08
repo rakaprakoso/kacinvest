@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:kacinvest/Tab/calculator_tab.dart';
 import 'package:kacinvest/Tab/profile.dart';
 import 'package:kacinvest/Tab/shop_tab.dart';
+import 'package:kacinvest/Tab/sidebar.dart';
 import 'package:kacinvest/pages/login_screen.dart';
 import 'package:kacinvest/screens/first_tab.dart';
 import 'package:kacinvest/screens/account.dart';
@@ -84,18 +85,17 @@ class _MyHomePageState extends State<App> {
         Scaffold(
           //appBar: AppBar(title: Text("Nav Bar")),
           appBar: PreferredSize(
-          child: Container(
-            decoration: BoxDecoration(boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                offset: Offset(0, 1.0),
-                blurRadius: 10.0,
-              )
-            ]),
-            child: _mainAppBar(),
+            child: Container(
+              decoration: BoxDecoration(boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  offset: Offset(0, 1.0),
+                  blurRadius: 10.0,
+                )
+              ]),
+              child: _mainAppBar(),
             ),
-          
-          preferredSize: Size.fromHeight(kToolbarHeight),
+            preferredSize: Size.fromHeight(kToolbarHeight),
           ),
           //backgroundColor: PaypalColors.LightOrange,
           body: DoubleBackToCloseApp(
@@ -182,6 +182,7 @@ class _MyHomePageState extends State<App> {
       },
       children: <Widget>[
         HomeTab(),
+        //MenuDashboardPage(),
         ShopTab(),
         //OtpScreen(),
         //MarketTab(),
@@ -189,6 +190,357 @@ class _MyHomePageState extends State<App> {
         CalculatorTab(),
         Profile(),
       ],
+    );
+  }
+}
+
+final Color backgroundColor = Color(0xFF4A4A58);
+
+class MenuDashboardPage extends StatefulWidget {
+  @override
+  _MenuDashboardPageState createState() => _MenuDashboardPageState();
+}
+
+class _MenuDashboardPageState extends State<MenuDashboardPage>
+    with SingleTickerProviderStateMixin {
+  int _currentIndex = 0;
+  PageController _pageController;
+
+  /* @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }*/
+
+  void pageChanged(int index) {
+    setState(() {
+      this._currentIndex = index;
+    });
+  }
+
+  void bottomTapped(int index) {
+    setState(() {
+      this._currentIndex = index;
+      _pageController.animateToPage(index,
+          duration: Duration(milliseconds: 1000), curve: Curves.ease);
+    });
+  }
+
+  void creditcardTapped(int index) {
+    setState(() {
+      this._currentIndex = index;
+    });
+  }
+
+  getStringValuesSF() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Return String
+    String stringValue = prefs.getString('username');
+    return stringValue;
+  }
+
+  Logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('username');
+
+    var route = new MaterialPageRoute(
+        builder: (BuildContext context) =>
+            //new App(idUser: data[0]['user_id'],firstname: data[0]['first_name'],lastname: data[0]['last_name'],username: data[0]['username'],),
+            new LoginScreen());
+    Navigator.of(context).pushReplacement(route);
+  }
+
+  //---------------------------------------------------------------------
+  bool isCollapsed = true;
+  double screenWidth, screenHeight;
+  final Duration duration = const Duration(milliseconds: 300);
+  AnimationController _controller;
+  Animation<double> _scaleAnimation;
+  Animation<double> _menuScaleAnimation;
+  Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: duration);
+    _scaleAnimation = Tween<double>(begin: 1, end: 0.8).animate(_controller);
+    _menuScaleAnimation =
+        Tween<double>(begin: 0.5, end: 1).animate(_controller);
+    _slideAnimation = Tween<Offset>(begin: Offset(-1, 0), end: Offset(0, 0))
+        .animate(_controller);
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+    _pageController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    screenHeight = size.height;
+    screenWidth = size.width;
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: <Widget>[
+          menu(context),
+          dashboard2(context),
+        ],
+      ),
+    );
+  }
+
+  Widget menu(context) {
+    return SlideTransition(
+      position: _slideAnimation,
+      child: ScaleTransition(
+        scale: _menuScaleAnimation,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 16.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Image.asset('assets/images/PayPal-logo.png', width: 150),
+                Text("Published 2020",
+                    style: TextStyle(color: Colors.orange, fontSize: 12, fontFamily: 'Montserrat')),
+                    SizedBox(height: 100),
+                Text("Settings",
+                    style: TextStyle(color: Colors.orange, fontSize: 22, fontFamily: 'Montserrat')),
+                SizedBox(height: 10),
+                Text("About Us",
+                    style: TextStyle(color: Colors.orange, fontSize: 22, fontFamily: 'Montserrat')),
+                SizedBox(height: 10),
+                Text("Logout",
+                    style: TextStyle(color: Colors.orange, fontSize: 22, fontFamily: 'Montserrat')),
+                SizedBox(height: 10),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildPageView() {
+    return PageView(
+      controller: _pageController,
+      onPageChanged: (index) {
+        pageChanged(index);
+      },
+      children: <Widget>[
+        HomeTab(),
+        //MenuDashboardPage(),
+        ShopTab(),
+        //OtpScreen(),
+        //MarketTab(),
+        MyInvestment(),
+        CalculatorTab(),
+        Profile(),
+      ],
+    );
+  }
+
+  Widget dashboard(context) {
+    return AnimatedPositioned(
+      duration: duration,
+      top: 0,
+      bottom: 0,
+      left: isCollapsed ? 0 : 0.6 * screenWidth,
+      right: isCollapsed ? 0 : -0.2 * screenWidth,
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: Material(
+          animationDuration: duration,
+          //borderRadius: BorderRadius.all(Radius.circular(40)),
+          elevation: 8,
+          color: backgroundColor,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            physics: ClampingScrollPhysics(),
+            child: Container(
+              padding: const EdgeInsets.only(
+                  left: 16, right: 16, top: 48, bottom: 48),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(
+                    height: screenHeight * 0.05,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        InkWell(
+                          child: Icon(Icons.menu, color: Colors.white),
+                          onTap: () {
+                            setState(() {
+                              if (isCollapsed)
+                                _controller.forward();
+                              else
+                                _controller.reverse();
+
+                              isCollapsed = !isCollapsed;
+                            });
+                          },
+                        ),
+                        Image.asset('assets/images/Paypal-logo-header.png',
+                            height: 25),
+                        //Text("My Cards", style: TextStyle(fontSize: 24, color: Colors.white)),
+                        Icon(Icons.settings, color: Colors.white),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: 400,
+                    height: 900,
+                    child: SizedBox.expand(
+                      child: buildPageView(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget dashboard2(context) {
+    return AnimatedPositioned(
+      duration: duration,
+      top: 0,
+      bottom: 0,
+      left: isCollapsed ? 0 : 0.4 * screenWidth,
+      right: isCollapsed ? 0 : -0.2 * screenWidth,
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: Material(
+          animationDuration: duration,
+          borderRadius: BorderRadius.all(Radius.circular(40)),
+          elevation: 8,
+          color: backgroundColor,
+          child: PageView(
+      children: <Widget>[
+        Scaffold(
+          //appBar: AppBar(title: Text("Nav Bar")),
+          appBar: PreferredSize(
+            child: Container(
+              decoration: BoxDecoration(boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  offset: Offset(0, 1.0),
+                  blurRadius: 10.0,
+                )
+              ]),
+              child: _mainAppBar(),
+            ),
+            preferredSize: Size.fromHeight(kToolbarHeight),
+          ),
+          //backgroundColor: PaypalColors.LightOrange,
+          body: DoubleBackToCloseApp(
+            child: SizedBox.expand(
+              child: buildPageView(),
+            ),
+            snackBar: const SnackBar(
+              duration: Duration(seconds: 1),
+              content: Text('Tap back again to leave'),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(5))),
+            ),
+          ),
+
+          bottomNavigationBar: BottomNavyBar(
+            selectedIndex: _currentIndex,
+            onItemSelected: (index) {
+              bottomTapped(index);
+            },
+            items: <BottomNavyBarItem>[
+              BottomNavyBarItem(
+                  activeColor: PaypalColors.Orange,
+                  inactiveColor: PaypalColors.Black50,
+                  title: Text('Home'),
+                  icon: Icon(Icons.home)),
+              BottomNavyBarItem(
+                  activeColor: PaypalColors.Orange,
+                  inactiveColor: PaypalColors.Black50,
+                  title: Text('Market'),
+                  icon: Icon(Icons.shopping_cart)),
+              BottomNavyBarItem(
+                  activeColor: PaypalColors.Orange,
+                  inactiveColor: PaypalColors.Black50,
+                  title: Text('My Investation'),
+                  icon: Icon(Icons.attach_money)),
+              BottomNavyBarItem(
+                  activeColor: PaypalColors.Orange,
+                  inactiveColor: PaypalColors.Black50,
+                  title: Text('Calculator'),
+                  icon: Icon(Icons.show_chart)),
+              BottomNavyBarItem(
+                  activeColor: PaypalColors.Orange,
+                  inactiveColor: PaypalColors.Black50,
+                  title: Text('Account'),
+                  icon: Icon(Icons.account_circle)),
+            ],
+          ),
+        ),
+      ],
+    ),
+        ),
+      ),
+    );
+  
+  }
+
+  AppBar _mainAppBar() {
+    return AppBar(
+      leading: IconButton(
+          icon: new Icon(Icons.settings),
+          color: PaypalColors.Orange,
+          onPressed: () {
+            //Logout();
+                                        setState(() {
+                              if (isCollapsed)
+                                _controller.forward();
+                              else
+                                _controller.reverse();
+
+                              isCollapsed = !isCollapsed;
+                            });
+          },
+        ),
+      title: Image.asset('assets/images/Paypal-logo-header.png', height: 25),
+      centerTitle: true,
+      actions: <Widget>[
+        /*Image.asset(
+          'assets/images/icon_school-bell.png',
+          color: PaypalColors.Orange,
+        )*/
+        new IconButton(
+          icon: new Icon(Icons.cancel),
+          color: PaypalColors.Orange,
+          onPressed: () {
+            Logout();
+          },
+        ),
+      ],
+      backgroundColor: Colors.white,
+      elevation: 10.0,
     );
   }
 }
@@ -388,7 +740,8 @@ class _OtpScreenState extends State<OtpScreen> {
         var route = new MaterialPageRoute(
             builder: (BuildContext context) =>
                 //new App(idUser: data[0]['user_id'],firstname: data[0]['first_name'],lastname: data[0]['last_name'],username: data[0]['username'],),
-                new App());
+                //new App());
+                new MenuDashboardPage());
         Navigator.of(context).pushReplacement(route);
       }
     }

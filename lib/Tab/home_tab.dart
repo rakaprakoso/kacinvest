@@ -1180,6 +1180,7 @@ Container _activityList(context) {
 }
 
 ListView _activityList2() {
+  
   return ListView(
     shrinkWrap: true,
     physics: ClampingScrollPhysics(),
