@@ -529,7 +529,7 @@ class _InvestCalcState extends State<InvestCalc> {
 
   List<String> currencies;
   String fromCurrency = "Euro";
-  String toCurrency = "Euro";
+  String toCurrency = "IDR";
   String result;
   String msg;
   List<String> currenciesName = [];

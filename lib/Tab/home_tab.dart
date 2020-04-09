@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 import 'package:intl/intl.dart';
+import 'package:kacinvest/Tab/shop_tab%20copy.dart';
 import 'package:kacinvest/src/data/API.dart';
 import 'package:kacinvest/src/data/data.dart';
 import 'package:kacinvest/src/data/datadb.dart';
@@ -11,6 +13,7 @@ import 'package:kacinvest/src/models/topstock_model.dart';
 import 'package:kacinvest/src/models/user_model.dart';
 import 'package:kacinvest/src/widgets/credit_card.dart';
 import 'package:kacinvest/src/widgets/credit_cardHome.dart';
+import 'package:kacinvest/src/widgets/promo.dart';
 import 'package:kacinvest/src/widgets/top_stock_card.dart';
 import 'package:kacinvest/src/widgets/user_card.dart';
 
@@ -140,10 +143,11 @@ class _HomeTabState extends State<HomeTab> {
       balance = _balance;
       currentbalancestart = returnbalance = currentbalance = 0;
       int i = 0;
-      int j = int.parse(balance[i]["stockNABunit"]);
-      int k = int.parse(balance[i]["priceNAB"]);
+      
 
       while (i < balance.length) {
+        int j = int.parse(balance[i]["stockNABunit"]);
+      int k = int.parse(balance[i]["priceNAB"]);
         currentbalancestart += int.parse(balance[i]["balanceStart"]);
         currentbalance += (j * k);
         returnbalance = currentbalance - currentbalancestart;
@@ -330,22 +334,33 @@ class _HomeTabState extends State<HomeTab> {
     BuildContext context,
   ) {
     final _media = MediaQuery.of(context).size;
-    return SingleChildScrollView(
-      child: !_isLoading
-          ? new CircularProgressIndicator()
-          : Column(
-              children: <Widget>[
-                _headerCard(context),
-                //_paypalCard(context),
-                _choiceText(),
-                _topStock(),
-                //_carousel(context),
-                _activityText(),
-                //_activityList(context),
-                _activityListtt(context, _username),
-                
-                ],
-            ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+          //primarySwatch: Colors.amber,
+          fontFamily: 'Montserrat',
+            
+          ),
+      home: Scaffold(
+        body: SingleChildScrollView(
+          child: !_isLoading
+              ? new CircularProgressIndicator()
+              : Column(
+                  children: <Widget>[
+                    _headerCard(context),
+                    Promo(),
+                    //_paypalCard(context),
+                    _choiceText(),
+                    _topStock(),
+                    //_carousel(context),
+                    _activityText(),
+                    //_activityList(context),
+                    _activityListtt(context, _username),
+                    
+                    ],
+                ),
+        ),
+      ),
     );
   }
 }
@@ -458,245 +473,248 @@ Container _headerCard(context) {
             )
           ],
         ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            margin: EdgeInsets.only(
-              left: 20,
-            ),
-            height: _media.longestSide <= 775
-                ? _media.height / 2.3
-                : _media.height / 2.3,
-            width: _media.width,
-            child: NotificationListener<OverscrollIndicatorNotification>(
-              onNotification: (overscroll) {
-                overscroll.disallowGlow();
-              },
-              child: Padding(
-                padding: EdgeInsets.only(right: 10),
-                child: GestureDetector(
-                  /*onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => OverviewPage())),*/
-                  child: Material(
-                    elevation: 1,
-                    shadowColor: Colors.grey.shade300,
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
+        FadeAnimation(
+                  1.1,
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              margin: EdgeInsets.only(
+                left: 20,
+              ),
+              height: _media.longestSide <= 775
+                  ? _media.height / 2.3
+                  : _media.height / 2.3,
+              width: _media.width,
+              child: NotificationListener<OverscrollIndicatorNotification>(
+                onNotification: (overscroll) {
+                  overscroll.disallowGlow();
+                },
+                child: Padding(
+                  padding: EdgeInsets.only(right: 10),
+                  child: GestureDetector(
+                    /*onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => OverviewPage())),*/
+                    child: Material(
+                      elevation: 1,
+                      shadowColor: Colors.grey.shade300,
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Stack(
+                        children: <Widget>[
+                          !_isLoading
+                              ? new CircularProgressIndicator()
+                              : Container(
+                                  width: _media.width - 40,
+                                  //height: 284,
+                                  padding: EdgeInsets.only(
+                                    left: 30,
+                                    right: 30,
+                                    top: 30,
+                                    bottom: 30,
+                                  ),
+                                  /*child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "Card no.",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
                     ),
-                    child: Stack(
-                      children: <Widget>[
-                        !_isLoading
-                            ? new CircularProgressIndicator()
-                            : Container(
-                                width: _media.width - 40,
-                                //height: 284,
-                                padding: EdgeInsets.only(
-                                  left: 30,
-                                  right: 30,
-                                  top: 30,
-                                  bottom: 30,
-                                ),
-                                /*child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  "Card no.",
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
                   ),
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Text(
-                  card.cardNo,
-                  style: Theme.of(context).textTheme.headline.copyWith(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Text(
+                    card.cardNo,
+                    style: Theme.of(context).textTheme.headline.copyWith(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        "Expires",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey.shade400,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                ),
-                SizedBox(height: 20),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "Expires",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey.shade400,
-                        fontWeight: FontWeight.bold,
+                      SizedBox(
+                        width: 10,
                       ),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(card.expiryDate,
-                        style: Theme.of(context).textTheme.headline.copyWith(
-                              color: Colors.black.withOpacity(0.5),
-                              fontWeight: FontWeight.bold,
-                            ))
-                  ],
-                )
-              ],
-            ),*/
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Row(
-                                          children: <Widget>[
-                                            Image.asset(
-                                                'assets/images/Paypal-logo.png',
-                                                height: 30),
-                                            SizedBox(width: 20),
-                                            Text(
-                                              'BALANCE',
-                                              style: TextStyle(
-                                                  color: PaypalColors.DarkBlue,
-                                                  fontFamily: "worksans",
-                                                  fontSize: 12),
-                                            ),
-                                          ],
-                                        ),
-                                        Icon(Icons.info_outline, size: 18)
-                                      ],
-                                    ),
-                                    SizedBox(height: 20),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Image.asset(
-                                            'assets/images/chip_thumb.png'),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: <Widget>[
-                                            Row(
-                                              children: <Widget>[
-                                                Text(
-                                                  '\IDR',
-                                                  style: TextStyle(
-                                                      fontFamily: "vistolsans",
-                                                      fontSize: 25),
-                                                ),
-                                                SizedBox(width: 13),
-                                                Text(
-                                                  "$amount",
-                                                  //oCcy.format(currentbalance),
-                                                  //"$currentbalance",
-                                                  //"Duit",
-                                                  style: TextStyle(
-                                                      fontFamily: "sfprotext",
-                                                      fontSize: 35),
-                                                ),
-                                                SizedBox(width: 0),
-                                              ],
-                                            ),
-                                            Text(
-                                              'My Investation',
-                                              style: TextStyle(
-                                                  fontFamily: "worksans",
-                                                  color: PaypalColors.Grey,
-                                                  fontSize: 17),
-                                            ),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(height: 20),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: <Widget>[
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: <Widget>[
-                                            Row(
-                                              children: <Widget>[
-                                                Text(
-                                                  'IDR',
-                                                  style: TextStyle(
-                                                      fontFamily: "vistolsans",
-                                                      fontSize: 15),
-                                                ),
-                                                SizedBox(width: 13),
-                                                Text(
-                                                  //"DUITT",
-                                                  //oCcy.format(j),
-                                                  //'$returnbalance',
-                                                  "$amount2",
-                                                  style: TextStyle(
-                                                      fontFamily: "sfprotext",
-                                                      fontSize: 30),
-                                                ),
-                                                SizedBox(width: 0),
-                                              ],
-                                            ),
-                                            Text(
-                                              'Return',
-                                              style: TextStyle(
-                                                  fontFamily: "worksans",
-                                                  color: PaypalColors.Grey,
-                                                  fontSize: 17),
-                                            ),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(height: 20),
-                                    Row(
-                                      children: <Widget>[
-                                        SizedBox(
-                                          height: 25,
-                                          child: FlatButton(
-                                            color: PaypalColors.LightGrey,
-                                            textColor: PaypalColors.DarkBlue,
-                                            child: Text(
-                                              "$name",
-                                              //"Rala",
-                                              //profile[0]["firstName"] +
-                                              // " " +
-                                              //  profile[0]["lastName"],
-                                              //profile[0]["firstName"],
-                                              style: TextStyle(
-                                                  fontFamily: "worksans",
-                                                  color: PaypalColors.DarkBlue,
-                                                  fontSize: 12),
-                                            ),
-                                            onPressed: () {
-                                              Navigator.of(context).push(
-                                                MaterialPageRoute<Null>(
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return Profile();
-                                                  },
-                                                  fullscreenDialog: true,
-                                                ),
-                                              );
-                                            },
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(30.0),
+                      Text(card.expiryDate,
+                          style: Theme.of(context).textTheme.headline.copyWith(
+                                color: Colors.black.withOpacity(0.5),
+                                fontWeight: FontWeight.bold,
+                              ))
+                    ],
+                  )
+                ],
+              ),*/
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Row(
+                                            children: <Widget>[
+                                              Image.asset(
+                                                  'assets/images/Paypal-logo.png',
+                                                  height: 30),
+                                              SizedBox(width: 20),
+                                              Text(
+                                                'BALANCE',
+                                                style: TextStyle(
+                                                    color: PaypalColors.DarkBlue,
+                                                    fontFamily: "worksans",
+                                                    fontSize: 12),
+                                              ),
+                                            ],
+                                          ),
+                                          Icon(Icons.info_outline, size: 18)
+                                        ],
+                                      ),
+                                      SizedBox(height: 20),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Image.asset(
+                                              'assets/images/chip_thumb.png'),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: <Widget>[
+                                              Row(
+                                                children: <Widget>[
+                                                  Text(
+                                                    '\IDR',
+                                                    style: TextStyle(
+                                                        fontFamily: "vistolsans",
+                                                        fontSize: 25),
+                                                  ),
+                                                  SizedBox(width: 13),
+                                                  Text(
+                                                    "$amount",
+                                                    //oCcy.format(currentbalance),
+                                                    //"$currentbalance",
+                                                    //"Duit",
+                                                    style: TextStyle(
+                                                        fontFamily: "sfprotext",
+                                                        fontSize: 35),
+                                                  ),
+                                                  SizedBox(width: 0),
+                                                ],
+                                              ),
+                                              Text(
+                                                'My Investation',
+                                                style: TextStyle(
+                                                    fontFamily: "worksans",
+                                                    color: PaypalColors.Grey,
+                                                    fontSize: 17),
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                      SizedBox(height: 20),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: <Widget>[
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: <Widget>[
+                                              Row(
+                                                children: <Widget>[
+                                                  Text(
+                                                    'IDR',
+                                                    style: TextStyle(
+                                                        fontFamily: "vistolsans",
+                                                        fontSize: 15),
+                                                  ),
+                                                  SizedBox(width: 13),
+                                                  Text(
+                                                    //"DUITT",
+                                                    //oCcy.format(j),
+                                                    //'$returnbalance',
+                                                    "$amount2",
+                                                    style: TextStyle(
+                                                        fontFamily: "sfprotext",
+                                                        fontSize: 30),
+                                                  ),
+                                                  SizedBox(width: 0),
+                                                ],
+                                              ),
+                                              Text(
+                                                'Return',
+                                                style: TextStyle(
+                                                    fontFamily: "worksans",
+                                                    color: PaypalColors.Grey,
+                                                    fontSize: 17),
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                      SizedBox(height: 20),
+                                      Row(
+                                        children: <Widget>[
+                                          SizedBox(
+                                            height: 25,
+                                            child: FlatButton(
+                                              color: PaypalColors.LightGrey,
+                                              textColor: PaypalColors.DarkBlue,
+                                              child: Text(
+                                                "$name",
+                                                //"Rala",
+                                                //profile[0]["firstName"] +
+                                                // " " +
+                                                //  profile[0]["lastName"],
+                                                //profile[0]["firstName"],
+                                                style: TextStyle(
+                                                    fontFamily: "worksans",
+                                                    color: PaypalColors.DarkBlue,
+                                                    fontSize: 12),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.of(context).push(
+                                                  MaterialPageRoute<Null>(
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return Profile();
+                                                    },
+                                                    fullscreenDialog: true,
+                                                  ),
+                                                );
+                                              },
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(30.0),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        Spacer()
-                                      ],
-                                    ),
-                                  ],
+                                          Spacer()
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -1332,7 +1350,7 @@ class AddButton extends StatelessWidget {
               color: Colors.black45),
             textAlign: TextAlign.center,
           ),
-        ],
+        ],stock
       ),*/
     );
   }
@@ -1557,7 +1575,7 @@ Container _topStock() {
   var _stockproducts = _HomeTabState._stockproducts;
 
   return Container(
-    height: 170,
+    height: 190,
     child: !_isLoading
         ? new CircularProgressIndicator()
         : ListView.builder(
@@ -1576,3 +1594,4 @@ Container _topStock() {
           ),
   );
 }
+

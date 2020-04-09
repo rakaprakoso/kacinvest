@@ -338,6 +338,7 @@ class _MenuDashboardPageState extends State<MenuDashboardPage>
 
   Widget buildPageView() {
     return PageView(
+      physics:new NeverScrollableScrollPhysics(),
       controller: _pageController,
       onPageChanged: (index) {
         pageChanged(index);

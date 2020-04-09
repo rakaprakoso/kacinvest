@@ -41,7 +41,9 @@ class _LoginScreenState extends State<LoginScreen>
         var route = new MaterialPageRoute(
             builder: (BuildContext context) =>
                 //new App(idUser: data[0]['user_id'],firstname: data[0]['first_name'],lastname: data[0]['last_name'],username: data[0]['username'],),
-                new App());
+                //new App());
+                
+                new MenuDashboardPage());
         Navigator.of(context).pushReplacement(route);
 
         _simpan() async {

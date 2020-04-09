@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 import 'package:intl/intl.dart';
+import 'package:kacinvest/Tab/shop_tab%20copy.dart';
 import 'package:kacinvest/src/data/API.dart';
 import 'package:kacinvest/src/data/data.dart';
 import 'package:kacinvest/src/data/datadb.dart';
@@ -54,28 +55,6 @@ class _ShopTabState extends State<ShopTab> {
         symbolAndNumberSeparator: ' ',
         fractionDigits: 3,
       ));
-
-/* Future<List> ProfileModel async {
-
-    var data = await http.get("http://kacinvest.arkeyproject.com/try/Profile.php");
-
-    var jsonData = json.decode(data.body);
-
-    List<ProfileModel> profiles = [];
-
-    for(var u in jsonData){
-
-      ProfileModel profile = ProfileModel(u["username"], u["referralCode"], u["firstName"], u["lastName"], u["bornDate"], u["email"], u["phoneNumber"], u["address"], u["bankAccountNumber"]);
-
-      profiles.add(profile);
-
-    }
-
-    print(profiles.length);
-
-    return profiles;
-
-  }*/
 
   _gettingdata() async {
     var profiles;
@@ -479,7 +458,11 @@ class _ShopTabState extends State<ShopTab> {
                     ],
                   ),
                 ),
-                Container(
+                category(),
+                //FadeAnimation(1.5, makeItem(image: 'assets/images/BGStock2.jpg', tag: 'red', context: context)),
+                //BuyPage(),
+                stocklist(),
+                /*Container(
                   child: NotificationListener<OverscrollIndicatorNotification>(
                     onNotification: (overscroll) {
                       overscroll.disallowGlow();
@@ -533,9 +516,235 @@ class _ShopTabState extends State<ShopTab> {
                       },
                     ),
                   ),
-                )
-              ],
+                ),
+              */],
             ),
+    );
+  }
+
+  Container stocklist() {
+    return Container(
+      child: FutureBuilder(
+        future: getStocks(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            print(snapshot.data);
+            var transactions = snapshot.data;
+            // tampilkan dvarata
+            return ListView.builder(
+              itemCount: filteredStocks.length,
+              shrinkWrap: true,
+              physics: ClampingScrollPhysics(),
+              padding: EdgeInsets.all(15),
+              itemBuilder: (BuildContext context, int index) {
+                return FadeAnimation(
+                    1.5,
+                    makeItem(
+                        image: filteredStocks[index].logo,
+                        tag: filteredStocks[index].stockID,
+                        name:filteredStocks[index].name,
+                        context: context));
+              },
+            );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
+    );
+  }
+
+  Widget makeItem({image, tag, name, context}) {
+    return Hero(
+      tag: tag,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => Stocks(
+                        image: image,
+                      )));
+        },
+        child: Container(
+          height: 80,
+          width: double.infinity,
+          padding: EdgeInsets.all(10),
+          margin: EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.white,
+              /*image: DecorationImage(
+              //image: AssetImage(image),
+              fit: BoxFit.cover
+            ),*/
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey[400],
+                    blurRadius: 10,
+                    offset: Offset(0, 2))
+              ]),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Expanded(
+                    child: Image.network(image,
+                        fit: BoxFit.contain),
+                    flex: 2,
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: FadeAnimation(
+                        1.2,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          
+                          children: <Widget>[
+                            Text(
+                              name,
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              name,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        )),
+                    flex: 8,
+                  ),
+                  Expanded(
+                    child: FadeAnimation(
+                        1.2,
+                        Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle, color: Colors.white),
+                          child: Center(
+                            child: Icon(
+                              Icons.favorite_border,
+                              size: 20,
+                            ),
+                          ),
+                        )),
+                    flex: 1,
+                  ),
+
+                  /*Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        FadeAnimation(1, Text("Sneakers", style: TextStyle(color: Colors.black, fontSize: 30, fontWeight: FontWeight.bold),)),
+                        SizedBox(height: 10,),
+                        FadeAnimation(1.1, Text("Nike", style: TextStyle(color: Colors.black, fontSize: 20),)),
+
+                      ],
+                    ),
+                  ),*/
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Padding category() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        height: 40,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: <Widget>[
+            AspectRatio(
+              aspectRatio: 2.2 / 1,
+              child: FadeAnimation(
+                  1,
+                  Container(
+                    margin: EdgeInsets.only(right: 10),
+                    decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Center(
+                      child: Text(
+                        "All",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  )),
+            ),
+            AspectRatio(
+              aspectRatio: 2.2 / 1,
+              child: FadeAnimation(
+                  1.1,
+                  Container(
+                    margin: EdgeInsets.only(right: 10),
+                    child: Center(
+                      child: Text(
+                        "Reksa Dana",
+                        style: TextStyle(fontSize: 17),
+                      ),
+                    ),
+                  )),
+            ),
+            AspectRatio(
+              aspectRatio: 2.2 / 1,
+              child: FadeAnimation(
+                  1.2,
+                  Container(
+                    margin: EdgeInsets.only(right: 10),
+                    child: Center(
+                      child: Text(
+                        "Stocks",
+                        style: TextStyle(fontSize: 17),
+                      ),
+                    ),
+                  )),
+            ),
+            AspectRatio(
+              aspectRatio: 2.2 / 1,
+              child: FadeAnimation(
+                  1.3,
+                  Container(
+                    margin: EdgeInsets.only(right: 10),
+                    child: Center(
+                      child: Text(
+                        "Saham",
+                        style: TextStyle(fontSize: 17),
+                      ),
+                    ),
+                  )),
+            ),
+            AspectRatio(
+              aspectRatio: 2.2 / 1,
+              child: FadeAnimation(
+                  1.4,
+                  Container(
+                    margin: EdgeInsets.only(right: 10),
+                    child: Center(
+                      child: Text(
+                        "Mix",
+                        style: TextStyle(fontSize: 17),
+                      ),
+                    ),
+                  )),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -593,5 +802,156 @@ class Debouncer {
       _timer.cancel();
     }
     _timer = Timer(Duration(milliseconds: milliseconds), action);
+  }
+}
+
+class Stocks extends StatefulWidget {
+  final String image;
+
+  const Stocks({Key key, this.image}) : super(key: key);
+
+  @override
+  _StocksState createState() => _StocksState();
+}
+
+class _StocksState extends State<Stocks> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Hero(
+          tag: 'red',
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(widget.image),
+                fit: BoxFit.cover
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey[400],
+                  blurRadius: 10,
+                  offset: Offset(0, 10)
+                )
+              ]
+            ),
+            child: Stack(
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 50),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          child: Icon(Icons.arrow_back_ios, color: Colors.white,),
+                        ),
+                      ),
+                      Container(
+                        width: 35,
+                        height: 35,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white
+                        ),
+                        child: Center(
+                          child: Icon(Icons.favorite_border, size: 20,),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  width: MediaQuery.of(context).size.width,
+                  height: 500,
+                  child: FadeAnimation(1, Container(
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomRight,
+                        colors: [
+                          Colors.black.withOpacity(.9),
+                          Colors.black.withOpacity(.0),
+                        ]
+                      )
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        FadeAnimation(1.3, Text("Sneakers", style: TextStyle(color: Colors.white, fontSize: 50, fontWeight: FontWeight.bold),)),
+                        SizedBox(height: 25,),
+                        FadeAnimation(1.4, Text("Size", style: TextStyle(color: Colors.white, fontSize: 20),)),
+                        SizedBox(height: 10,),
+                        Row(
+                          children: <Widget>[
+                            FadeAnimation(1.5, Container(
+                              width: 40,
+                              height: 40,
+                              margin: EdgeInsets.only(right: 20),
+                              child: Center(
+                                child: Text('40', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)
+                              ),
+                            )),
+                            FadeAnimation(1.45, Container(
+                              width: 40,
+                              height: 40,
+                              margin: EdgeInsets.only(right: 20),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10)
+                              ),
+                              child: Center(
+                                child: Text('42', style: TextStyle(fontWeight: FontWeight.bold),)
+                              ),
+                            )),
+                            FadeAnimation(1.46, Container(
+                              width: 40,
+                              height: 40,
+                              margin: EdgeInsets.only(right: 20),
+                              child: Center(
+                                child: Text('44', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)
+                              ),
+                            )),
+                            FadeAnimation(1.47, Container(
+                              width: 40,
+                              height: 40,
+                              margin: EdgeInsets.only(right: 20),
+                              child: Center(
+                                child: Text('46', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)
+                              ),
+                            )),
+                          ],
+                        ),
+                        SizedBox(height: 60,),
+                        FadeAnimation(1.5, Container(
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15)
+                          ),
+                          child: Center(
+                            child: Text('Buy Now', style: TextStyle(fontWeight: FontWeight.bold),)
+                          ),
+                        )),
+                        SizedBox(height: 30,),
+                      ],
+                    ),
+                  )),
+                )
+              ],
+            ),
+          ),
+        )
+      ),
+    );
   }
 }

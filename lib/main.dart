@@ -23,6 +23,12 @@ class KacinvestAppLogin extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       //home: App(),
+      theme: ThemeData(
+          //primarySwatch: Colors.amber,
+          fontFamily: 'Montserrat',
+            
+          ),
+          
       home:  Scaffold(
         body : DoubleBackToCloseApp(
           child: new LoginScreen(),
@@ -42,8 +48,13 @@ class KacinvestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return new MaterialApp(
       debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+          //primarySwatch: Colors.amber,
+          fontFamily: 'Montserrat',
+            
+          ),
       //home: App(),
       home:  Scaffold(
         body : DoubleBackToCloseApp(
