@@ -121,11 +121,12 @@ class _ShopTabState extends State<ShopTab> {
       balance = _balance;
       currentbalancestart = returnbalance = currentbalance = 0;
       int i = 0;
-      int j = int.parse(balance[i]["stockNABunit"]);
-      int k = int.parse(balance[i]["priceNAB"]);
+
 
       while (i < balance.length) {
-        currentbalancestart += int.parse(balance[i]["balanceStart"]);
+              double j = double.parse(balance[i]["stockNABunit"]);
+      double k = double.parse(balance[i]["priceNAB"]);
+        currentbalancestart += double.parse(balance[i]["balanceStart"]);
         currentbalance += (j * k);
         returnbalance = currentbalance - currentbalancestart;
         i++;

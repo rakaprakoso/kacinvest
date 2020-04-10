@@ -4,6 +4,7 @@ import 'package:kacinvest/StockCard/awesome_card.dart';
 import 'package:kacinvest/StockCard/extra/helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kacinvest/pages/main_page.dart';
 
 class CreditCard extends StatefulWidget {
   final String cardNumber;
@@ -56,6 +57,8 @@ class _CreditCardState extends State<CreditCard>
   AnimationController _controller;
   Animation<double> _moveToBack;
   Animation<double> _moveToFront;
+
+static var chartss=MyInvestment.chartss;
 
   @override
   void initState() {
@@ -216,7 +219,8 @@ class _CreditCardState extends State<CreditCard>
                         cvv: widget.cvv,
                         width: cardWidth,
                         height: cardHeight,
-                        color: widget.backTextColor)
+                        color: widget.backTextColor,
+                        charts : chartss)
                     .layout1()
           ],
         ),

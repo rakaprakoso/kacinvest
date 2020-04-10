@@ -27,6 +27,7 @@ class HomeTab extends StatefulWidget {
   @override
   _HomeTabState createState() => _HomeTabState();
   static var profile = _HomeTabState.profile;
+  static var balance = _HomeTabState.balance;
 }
 
 class _HomeTabState extends State<HomeTab> {
@@ -146,9 +147,9 @@ class _HomeTabState extends State<HomeTab> {
       
 
       while (i < balance.length) {
-        int j = int.parse(balance[i]["stockNABunit"]);
-      int k = int.parse(balance[i]["priceNAB"]);
-        currentbalancestart += int.parse(balance[i]["balanceStart"]);
+        double j = double.parse(balance[i]["stockNABunit"]);
+      double k = double.parse(balance[i]["priceNAB"]);
+        currentbalancestart += double.parse(balance[i]["balanceStart"]);
         currentbalance += (j * k);
         returnbalance = currentbalance - currentbalancestart;
         i++;
@@ -368,14 +369,14 @@ class _HomeTabState extends State<HomeTab> {
 Container _headerCard(context) {
   var _isLoading = _HomeTabState._isLoading;
   var balance = _HomeTabState.balance;
-  int currentbalance = _HomeTabState.currentbalance;
-  int currentbalancestart = _HomeTabState.currentbalancestart;
-  int returnbalance = _HomeTabState.returnbalance;
+  double currentbalance = _HomeTabState.currentbalance;
+  double currentbalancestart = _HomeTabState.currentbalancestart;
+  double returnbalance = _HomeTabState.returnbalance;
   var amount;
   var amount2;
   var name;
   var profile = _HomeTabState.profile;
-  int i, j;
+  double i, j;
   if (currentbalance == null) {
     i = 0;
   } else {
@@ -429,7 +430,7 @@ Container _headerCard(context) {
         amount: long3,
       )
       .output
-      .compactNonSymbol;
+      .nonSymbol;
 
   var _username = _HomeTabState._username;
 

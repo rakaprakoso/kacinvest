@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_sparkline/flutter_sparkline.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:kacinvest/Tab/home_tab.dart';
+import 'package:kacinvest/Tab/shop_tab%20copy.dart';
 import 'package:kacinvest/util.dart';
 import 'shop_items_page.dart';
 import '../custom_icon/spin_icons.dart';
@@ -10,10 +14,12 @@ import '../custom_icon/kacinvest_icon_icons.dart';
 import 'package:kacinvest/StockCard/awesome_card.dart';
 import 'dart:math' as math;
 import 'dart:ui';
+import 'package:http/http.dart' as http;
 
 class MyInvestment extends StatefulWidget {
   @override
   _MyInvestmentState createState() => _MyInvestmentState();
+  static var chartss = _MyInvestmentState.chartss;
 }
 
 class _MyInvestmentState extends State<MyInvestment> {
@@ -224,6 +230,8 @@ class _MyInvestmentState extends State<MyInvestment> {
     ]
   ];
 
+  var _isLoading = false;
+
   static final List<String> chartDropdownItems = [
     'Last 7 days',
     'Last month',
@@ -231,6 +239,42 @@ class _MyInvestmentState extends State<MyInvestment> {
   ];
   String actualDropdown = chartDropdownItems[0];
   int actualChart = 0;
+  var chart;
+  static List<double> chartss = [];
+  var data = [0.0, 1.0, 10.5, 2.0, 0.0, 0.0, -0.5, -1.0, -0.5, 0.0, 0.0];
+  var balance = HomeTab.balance;
+  chartModel() async {
+    final url = "http://kacinvest.arkeyproject.com/try/ViewReturn.php";
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final profiles = json.decode(response.body);
+
+      setState(() {
+        chart = profiles;
+        print(chart);
+        print(chart.length);
+        chartss.clear();
+        int i = 0;
+        while (i < chart.length) {
+          double j = double.parse(chart[i]['PriceNAB_after']);
+          chartss.add(j);
+
+          i++;
+        }
+        ;
+        print(chartss);
+        print(chartss.length);
+        _isLoading = true;
+        data = chartss;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    chartModel();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -242,188 +286,9 @@ class _MyInvestmentState extends State<MyInvestment> {
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              /*Container(
-                height: 500,
-                child: StaggeredGridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12.0,
-                  mainAxisSpacing: 12.0,
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  children: <Widget>[
-                    _buildTile(
-                      Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('Investment Total',
-                                      style:
-                                          TextStyle(color: Colors.blueAccent)),
-                                  Text('2.120.000 IDR',
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 34.0))
-                                ],
-                              ),
-                              Material(
-                                  color: Colors.blue,
-                                  borderRadius: BorderRadius.circular(24.0),
-                                  child: Center(
-                                      child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Icon(Icons.timeline,
-                                        color: Colors.white, size: 30.0),
-                                  )))
-                            ]),
-                      ),
-                    ),
-                    _buildTile(
-                      Padding(
-                          padding: const EdgeInsets.all(24.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text('Return',
-                                          style:
-                                              TextStyle(color: Colors.green)),
-                                      Text('IDR 300.000',
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 34.0)),
-                                    ],
-                                  ),
-                                  DropdownButton(
-                                      isDense: true,
-                                      value: actualDropdown,
-                                      onChanged: (String value) => setState(() {
-                                            actualDropdown = value;
-                                            actualChart =
-                                                chartDropdownItems.indexOf(
-                                                    value); // Refresh the chart
-                                          }),
-                                      items: chartDropdownItems
-                                          .map((String title) {
-                                        return DropdownMenuItem(
-                                          value: title,
-                                          child: Text(title,
-                                              style: TextStyle(
-                                                  color: Colors.blue,
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 14.0)),
-                                        );
-                                      }).toList())
-                                ],
-                              ),
-                              Padding(padding: EdgeInsets.only(bottom: 4.0)),
-                              Sparkline(
-                                data: charts[actualChart],
-                                lineWidth: 5.0,
-                                lineColor: Colors.greenAccent,
-                              )
-                            ],
-                          )),
-                    ),
-                    _buildTile(
-                      Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('Reksa Dana Products',
-                                      style:
-                                          TextStyle(color: Colors.redAccent)),
-                                  Text('3',
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 34.0))
-                                ],
-                              ),
-                              Material(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(24.0),
-                                  child: Center(
-                                      child: Padding(
-                                    padding: EdgeInsets.all(16.0),
-                                    child: Icon(Icons.store,
-                                        color: Colors.white, size: 30.0),
-                                  )))
-                            ]),
-                      ),
-                      onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => ShopItemsPage())),
-                    )
-                  ],
-                  staggeredTiles: [
-                    StaggeredTile.extent(3, 110.0),
-                    StaggeredTile.extent(2, 220.0),
-                    StaggeredTile.extent(2, 110.0),
-                  ],
-                ),
-              ),
-              
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                ),
-                child : Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text('Investment Total',
-                                style: TextStyle(color: Colors.blueAccent)),
-                            Text('2.120.000 IDR',
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 34.0))
-                          ],
-                        ),
-                        Material(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(24.0),
-                            child: Center(
-                                child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Icon(Icons.timeline,
-                                  color: Colors.white, size: 30.0),
-                            )))
-                      ]),
-                ),
-              ),
-              */
               _balance(_media),
               _invest(),
+              
               /*StockCard(),
               SlidingCardsView(),
               
@@ -433,6 +298,36 @@ class _MyInvestmentState extends State<MyInvestment> {
         ),
       ),
     );
+  }
+
+  getBalance() async {
+    var response = await http.get(
+        "http://kacinvest.arkeyproject.com/try/Balance.php?username=rakadprakoso");
+    return jsonDecode(response.body);
+  }
+
+  FutureBuilder balanceList() {
+    return FutureBuilder(
+        future: getBalance(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            print(snapshot.data);
+            var balance = snapshot.data;
+            // tampilkan dvarata
+            return ListView.builder(
+              itemCount: balance.length,
+              physics: ClampingScrollPhysics(),
+              shrinkWrap: true,
+              itemBuilder: (BuildContext context, int index) {
+                return FadeAnimation(1.5, StockCard());
+              },
+            );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
+      );
+    
   }
 
   Widget _buildTile(Widget child, {Function() onTap}) {
@@ -614,7 +509,7 @@ class _MyInvestmentState extends State<MyInvestment> {
               ],
             ),
           ),
-          StockCard(),
+          balanceList(),
         ],
       ),
     );

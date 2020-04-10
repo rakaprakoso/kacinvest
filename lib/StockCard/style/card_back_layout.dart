@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sparkline/flutter_sparkline.dart';
+import 'package:kacinvest/pages/main_page.dart';
 
 class CardBackLayout {
   String cvv;
   double width;
   double height;
   Color color;
+  List<double> charts;
+  
   var data = [0.0, 1.0, 10.5, 2.0, 0.0, 0.0, -0.5, -1.0, -0.5, 0.0, 0.0];
-
-  CardBackLayout({this.cvv, this.width, this.height, this.color});
+  var chartss=MyInvestment.chartss;
+  CardBackLayout({this.cvv, this.width, this.height, this.color, this.charts});
 
   Widget layout1() {
     return Column(
@@ -56,7 +59,14 @@ class CardBackLayout {
           padding: EdgeInsets.all(10),
           child : Container(
             child: new Sparkline(
-              data: data,
+              data: charts,
+              lineWidth: 5.0,
+              pointsMode: PointsMode.last,
+  pointSize: 6.0,
+  pointColor: Colors.blueGrey,
+  fillMode: FillMode.below,
+  fillColor: Colors.lightGreen,
+  lineColor: Colors.lightGreen,
             ),
           ),
         ),

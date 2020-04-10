@@ -278,6 +278,10 @@ class _CurrencyConverterState2 extends State<CurrencyConverter2> {
   String result;
   List<String> currenciesName = [];
   List<String> currenciesSymbol = [];
+
+  List<double> chart;
+  List<String> charts;
+
   FlutterMoneyFormatter fmf = FlutterMoneyFormatter(
       amount: 0,
       settings: MoneyFormatterSettings(
@@ -292,6 +296,7 @@ class _CurrencyConverterState2 extends State<CurrencyConverter2> {
   void initState() {
     super.initState();
     _loadCurrencies();
+    _loadchartrerturn();
   }
 
   Future<String> _loadCurrencies() async {
@@ -319,6 +324,27 @@ class _CurrencyConverterState2 extends State<CurrencyConverter2> {
       i++;
     }
     print(currenciesName);
+    return "Success";
+  }
+
+    Future<String> _loadchartrerturn() async {
+    int i = 0;
+    String uri =
+        "http://kacinvest.arkeyproject.com/try/ViewReturn.php";
+    var response = await http
+        .get(Uri.encodeFull(uri), headers: {"Accept": "application/json"});
+    charts = json.decode(response.body);
+    //Map curMap = responseBody['stk00001'];
+    //Map curMap2 = curMap['ALL'];
+    //charts = curMap.keys.toList();
+    //charts = responseBody;
+    setState(() {});
+    //print(responseBody);
+    
+    //print(curMap);
+    //print(curMap.length);
+    print(charts);
+    //print(charts.length);
     return "Success";
   }
 
