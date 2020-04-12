@@ -112,12 +112,20 @@ flutter:
            style: italic
          - asset: assets/fonts/montserrat/Montserrat-Bold.ttf
            weight: 700
+     - family: MavenPro
+       fonts:
+         - asset: assets/fonts/maven/MavenPro-Regular.ttf
+         - asset: assets/fonts/maven/MavenPro-Bold.ttf
+           weight: 700
      - family: MyCustomIcons
        fonts:
          - asset : assets/fonts/customicon/spin.ttf
      - family:  KacinvestIcon
        fonts:
          - asset: assets/fonts/customicon/KacinvestIcon.ttf
+     - family:  KacinvestIcon2
+       fonts:
+         - asset: assets/fonts/customicon/KacinvestIcon2.ttf
 #     - family: Trajan Pro
 #       fonts:
 #         - asset: fonts/TrajanPro.ttf

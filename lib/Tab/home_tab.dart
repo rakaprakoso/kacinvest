@@ -5,6 +5,7 @@ import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 import 'package:intl/intl.dart';
 import 'package:kacinvest/Tab/shop_tab%20copy.dart';
+import 'package:kacinvest/data/account.dart';
 import 'package:kacinvest/screens/app.dart';
 import 'package:kacinvest/src/data/API.dart';
 import 'package:kacinvest/src/data/data.dart';
@@ -388,39 +389,19 @@ class _HomeTabState extends State<HomeTab> {
 Container _headerCard(context) {
 
   var _isLoading = _HomeTabState._isLoading;
-  var balance = _HomeTabState.balance;
-  double currentbalance = _HomeTabState.currentbalance;
-  double currentbalancestart = _HomeTabState.currentbalancestart;
-  double returnbalance = _HomeTabState.returnbalance;
+
+  double currentbalance =accountBloc.currentbalance;
+  double currentbalancestart = accountBloc.currentbalancestart;
+  double returnbalance = accountBloc.returnbalance;
   var amount;
   var amount2;
   var name;
-  var profile = _HomeTabState.profile;
-  double i, j;
-  i=j=0;
 
-  if(balance.length==0){
-    i=j=0;
-  };
-  if (currentbalance == null) {
-    i = 0;
-  } else {
-    i = currentbalance;
-  }
-  if (returnbalance == null) {
-    j = 0;
-  } else {
-    j = returnbalance;
-  }
-  if (profile == null) {
-    name = "Loading..";
-  } else {
-    name = profile[0]["firstName"] + " " + profile[0]["lastName"];
-  }
 
-  //var long2 = double.parse(currentbalance);
- var long2 = i.toDouble();
-  var long3 = j.toDouble();
+name = accountBloc.username;
+
+ var long2 = currentbalance.toDouble();
+  var long3 = returnbalance.toDouble();
   FlutterMoneyFormatter fmf = FlutterMoneyFormatter(
       amount: 0,
       settings: MoneyFormatterSettings(
@@ -430,8 +411,7 @@ Container _headerCard(context) {
         symbolAndNumberSeparator: ' ',
         fractionDigits: 0,
       ));
-  //MoneyFormatterOutput fo = fmf.output;
-  //amount = fo.nonSymbol;
+
   amount = fmf
       .copyWith(
         amount: long2,
@@ -447,8 +427,6 @@ Container _headerCard(context) {
 
 
   var _username = _HomeTabState._username;
-
-  final oCcy = new NumberFormat("#,##0", "en_US");
 
   final _media = MediaQuery.of(context).size;
   return Container(

@@ -245,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen>
             children: <Widget>[
               Container(
                 child:
-                    Image.asset('assets/images/PayPal-logo.png', height: 100),
+                   new Image.asset('assets/images/KacinvestLogo', height: 100),
                 padding: EdgeInsets.all(120.0),
               ),
               new Row(

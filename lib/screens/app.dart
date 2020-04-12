@@ -8,6 +8,7 @@ import 'package:kacinvest/Tab/profile.dart';
 import 'package:kacinvest/Tab/shop_tab.dart';
 import 'package:kacinvest/Tab/sidebar.dart';
 import 'package:kacinvest/custom_icon/kacinvest_icon_icons.dart';
+import 'package:kacinvest/data/account.dart';
 import 'package:kacinvest/pages/login_screen.dart';
 import 'package:kacinvest/screens/first_tab.dart';
 import 'package:kacinvest/screens/account.dart';
@@ -25,10 +26,11 @@ final Color backgroundColor = Color(0xFF4A4A58);
 class MenuDashboardPage extends StatefulWidget {
   @override
   _MenuDashboardPageState createState() => _MenuDashboardPageState();
-  static var dataa=_MenuDashboardPageState.dataa;
-  static var charts=_MenuDashboardPageState.chartsss3;
-  static var charts2=_MenuDashboardPageState.chartss3;
-  static var charttemp2=_MenuDashboardPageState.charttemp2;
+  static var dataa = _MenuDashboardPageState.dataa;
+  static var charts = _MenuDashboardPageState.chartsss3;
+  static var charts2 = _MenuDashboardPageState.chartss3;
+  static var charttemp2 = _MenuDashboardPageState.charttemp2;
+  static var listStock = _MenuDashboardPageState.listStock;
 }
 
 class _MenuDashboardPageState extends State<MenuDashboardPage>
@@ -79,6 +81,13 @@ class _MenuDashboardPageState extends State<MenuDashboardPage>
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove('username');
 
+    void dispose() {
+      _controller.dispose();
+      super.dispose();
+      _pageController.dispose();
+    }
+
+    _isLoading = false;
     var route = new MaterialPageRoute(
         builder: (BuildContext context) =>
             //new App(idUser: data[0]['user_id'],firstname: data[0]['first_name'],lastname: data[0]['last_name'],username: data[0]['username'],),
@@ -108,6 +117,7 @@ class _MenuDashboardPageState extends State<MenuDashboardPage>
         .animate(_controller);
     _pageController = PageController();
     _getData();
+    accountBloc = AccountBloc();
     animationController = new AnimationController(
       vsync: this,
       duration: new Duration(seconds: 1),
@@ -121,12 +131,18 @@ class _MenuDashboardPageState extends State<MenuDashboardPage>
     _controller.dispose();
     super.dispose();
     _pageController.dispose();
+    //accountBloc = null;
   }
 
 //GET DATA------------------------------------------
   static var _isLoading = false;
   static var dataa;
+  static var listStock = [];
+
   _getData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var username = prefs.getString('username');
+    accountBloc.incrementCounter(this, username);
     final url = "http://kacinvest.arkeyproject.com/try/SelectAllUsers.php";
     final response = await http.get(url);
     if (response.statusCode == 200) {
@@ -137,69 +153,59 @@ class _MenuDashboardPageState extends State<MenuDashboardPage>
         dataa = users;
         print(dataa);
         print(dataa.length);
+
+        if (listStock.length == 0) {
+          for (var i = 0; i < dataa.length; i++) {
+            String x = dataa[i]['stockID'];
+            listStock.add(x);
+          }
+        }
       });
 
-          //int i = 0;
+//Load Balance---------------------------------------------------------------
+      var balance;
+      final url2 =
+          "http://kacinvest.arkeyproject.com/try/Balance.php?username=$username";
+      final response2 = await http.get(url2);
+      if (response2.statusCode == 200) balance = json.decode(response2.body);
+      accountBloc.loadBalance(this, balance);
 
-    //while (i < dataa.length) {
-//while (i < 1) {
-  //doubletemp.clear();
-      //charttemp2.clear();
-      
-int x=0;
-for (var i = 0; i < dataa.length; i++) {
- var stockid = dataa[i]['stockID'];
-      final url =
-          "http://kacinvest.arkeyproject.com/try/ViewReturn.php?stockid=${stockid}";
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final profiles = json.decode(response.body);
+      //Load Balance---------------------------------------------------------------
+      var transaction;
+      final url1 =
+          "http://kacinvest.arkeyproject.com/try/Transactions.php?username=$username";
+      final response1 = await http.get(url1);
+      if (response1.statusCode == 200)
+        transaction = json.decode(response1.body);
+      accountBloc.loadTransactions(this, transaction);
 
-        
-        charttemp2 = profiles;
-
-        for (var j = 0; j < charttemp2.length; j++) {
-          
-  double x = double.parse(charttemp2[j]['PriceNAB_after']);
-        doubletemp.add(x);}
-        
-chartsss3.add(doubletemp);
-doubletemp=[];
-chartss3= doubletemp;
-
-
+//LoadReturn---------------------------------------------------------------
+      for (var i = 0; i < dataa.length; i++) {
+        var stockid = dataa[i]['stockID'];
+        final url =
+            "http://kacinvest.arkeyproject.com/try/ViewReturn.php?stockid=${stockid}";
+        final response = await http.get(url);
+        if (response.statusCode == 200) {
+          final profiles = json.decode(response.body);
+          charttemp2 = profiles;
+          for (var j = 0; j < charttemp2.length; j++) {
+            double x = double.parse(charttemp2[j]['PriceNAB_after']);
+            doubletemp.add(x);
+          }
+          chartsss3.add(doubletemp);
+          accountBloc.addGraphic(this, doubletemp);
+          doubletemp = [];
+          chartss3 = doubletemp;
+        }
       }
-}
-
-      /*int j = 0;
-      while (j < charttemp2.length) {
-        double x = double.parse(chart[j]['PriceNAB_after']);
-        doubletemp.add(x);
-        j++;
-      };*/
-
-      
-      
-
-           //if(i==1)chartsss3.add(chartss3);
-           //else chartsss3.add(chartss4);
-      //     chartsss3.add(chartss4);
-      //print('${chartsss3}');
-      //print(chartsss2.length);
-      //charttemp23.add(charttemp2);
-      //charttemp23= charttemp2.take(3).toList();
-    //  i++;
-    //}
-          setState(() {
+      setState(() {
         _isLoading = true;
       });
     }
-
-
   }
 
   //RETURN
-    //-----------------------------------------
+  //-----------------------------------------
   static var charttemp2;
   var charttemp23;
   static List<double> chartss3 = [2, 2, 2, 3];
@@ -208,49 +214,6 @@ chartss3= doubletemp;
   static List<List<double>> chartsss3 = [];
 
   static List<double> doubletemp = [];
-
-  chartModel3() async {
-    //chartsss3.clear();
-    
-    int i = 0;
-
-    while (i < dataa.length) {
-
-      var stockid = dataa[i]['stockID'];
-      final url =
-          "http://kacinvest.arkeyproject.com/try/ViewReturn.php?stockid=${stockid}";
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final profiles = json.decode(response.body);
-
-        charttemp2 = profiles;
-      }
-
-for (var i = 0; i < charttemp2.length; i++) {
-  double x = double.parse(charttemp2[i]['PriceNAB_after']);
-        doubletemp.add(x);
-}
-      /*int j = 0;
-      while (j < charttemp2.length) {
-        double x = double.parse(chart[j]['PriceNAB_after']);
-        doubletemp.add(x);
-        j++;
-      };*/
-var chartempty2 = doubletemp.getRange(20, 80);
-      chartsss3.add(chartempty2);
-
-      //     chartsss3.add(chartss3);
-      //     chartsss3.add(chartss4);
-      //print('${chartsss3}');
-      //print(chartsss2.length);
-      //charttemp23.add(charttemp2);
-      //charttemp23= charttemp2.take(3).toList();
-      i++;
-    }
-  }
-//------------------------------------------------------------------
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -261,35 +224,36 @@ var chartempty2 = doubletemp.getRange(20, 80);
     return Scaffold(
       backgroundColor: Colors.white,
       body: !_isLoading
-              ? splashscreen(context)
-              : Stack(
-        children: <Widget>[
-          menu(context),
-          dashboard2(context),
-        ],
-      ),
+          ? splashscreen(context)
+          : Stack(
+              children: <Widget>[
+                menu(context),
+                dashboard2(context),
+              ],
+            ),
     );
   }
 
-Widget splashscreen(context){
-      Size size = MediaQuery.of(context).size;
+  Widget splashscreen(context) {
+    Size size = MediaQuery.of(context).size;
     screenHeight = size.height;
     screenWidth = size.width;
-  return Center(
+    return Center(
       child: Container(
-        height: screenHeight *0.6,
+        height: screenHeight * 0.6,
         child: Column(
           children: <Widget>[
-            new Image.asset('assets/images/KacinvestLogo.png',width:screenWidth*0.6,),
+            new Image.asset(
+              'assets/images/KacinvestLogo.png',
+              width: screenWidth * 0.6,
+            ),
             new AnimatedBuilder(
               animation: animationController,
               child: new Container(
                 height: 150.0,
                 width: 150.0,
-                child: new Icon(
-                  KacinvestIcon.spin4,
-                    color: Colors.orange, size: 60.0
-                ),
+                child: new Icon(KacinvestIcon.spin4,
+                    color: Colors.orange, size: 60.0),
               ),
               builder: (BuildContext context, Widget _widget) {
                 return new Transform.rotate(
@@ -301,8 +265,8 @@ Widget splashscreen(context){
           ],
         ),
       ),
-  );
-}
+    );
+  }
 
   Widget menu(context) {
     return SlideTransition(
@@ -320,16 +284,28 @@ Widget splashscreen(context){
               children: <Widget>[
                 Image.asset('assets/images/PayPal-logo.png', width: 150),
                 Text("Published 2020",
-                    style: TextStyle(color: Colors.orange, fontSize: 12, fontFamily: 'Montserrat')),
-                    SizedBox(height: 100),
+                    style: TextStyle(
+                        color: Colors.orange,
+                        fontSize: 12,
+                        fontFamily: 'Montserrat')),
+                SizedBox(height: 100),
                 Text("Settings",
-                    style: TextStyle(color: Colors.orange, fontSize: 22, fontFamily: 'Montserrat')),
+                    style: TextStyle(
+                        color: Colors.orange,
+                        fontSize: 22,
+                        fontFamily: 'Montserrat')),
                 SizedBox(height: 10),
                 Text("About Us",
-                    style: TextStyle(color: Colors.orange, fontSize: 22, fontFamily: 'Montserrat')),
+                    style: TextStyle(
+                        color: Colors.orange,
+                        fontSize: 22,
+                        fontFamily: 'Montserrat')),
                 SizedBox(height: 10),
                 Text("Logout",
-                    style: TextStyle(color: Colors.orange, fontSize: 22, fontFamily: 'Montserrat')),
+                    style: TextStyle(
+                        color: Colors.orange,
+                        fontSize: 22,
+                        fontFamily: 'Montserrat')),
                 SizedBox(height: 10),
               ],
             ),
@@ -341,7 +317,7 @@ Widget splashscreen(context){
 
   Widget buildPageView() {
     return PageView(
-      physics:new NeverScrollableScrollPhysics(),
+      physics: new NeverScrollableScrollPhysics(),
       controller: _pageController,
       onPageChanged: (index) {
         pageChanged(index);
@@ -440,94 +416,93 @@ Widget splashscreen(context){
           elevation: 8,
           color: backgroundColor,
           child: PageView(
-      children: <Widget>[
-        Scaffold(
-          //appBar: AppBar(title: Text("Nav Bar")),
-          appBar: PreferredSize(
-            child: Container(
-              decoration: BoxDecoration(boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  offset: Offset(0, 1.0),
-                  blurRadius: 10.0,
-                )
-              ]),
-              child: _mainAppBar(),
-            ),
-            preferredSize: Size.fromHeight(kToolbarHeight),
-          ),
-          //backgroundColor: PaypalColors.LightOrange,
-          body: DoubleBackToCloseApp(
-            child: SizedBox.expand(
-              child: buildPageView(),
-            ),
-            snackBar: const SnackBar(
-              duration: Duration(seconds: 1),
-              content: Text('Tap back again to leave'),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
-            ),
-          ),
+            children: <Widget>[
+              Scaffold(
+                //appBar: AppBar(title: Text("Nav Bar")),
+                appBar: PreferredSize(
+                  child: Container(
+                    decoration: BoxDecoration(boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        offset: Offset(0, 1.0),
+                        blurRadius: 10.0,
+                      )
+                    ]),
+                    child: _mainAppBar(),
+                  ),
+                  preferredSize: Size.fromHeight(kToolbarHeight),
+                ),
+                //backgroundColor: PaypalColors.LightOrange,
+                body: DoubleBackToCloseApp(
+                  child: SizedBox.expand(
+                    child: buildPageView(),
+                  ),
+                  snackBar: const SnackBar(
+                    duration: Duration(seconds: 1),
+                    content: Text('Tap back again to leave'),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(5))),
+                  ),
+                ),
 
-          bottomNavigationBar: BottomNavyBar(
-            selectedIndex: _currentIndex,
-            onItemSelected: (index) {
-              bottomTapped(index);
-            },
-            items: <BottomNavyBarItem>[
-              BottomNavyBarItem(
-                  activeColor: PaypalColors.Orange,
-                  inactiveColor: PaypalColors.Black50,
-                  title: Text('Home'),
-                  icon: Icon(Icons.home)),
-              BottomNavyBarItem(
-                  activeColor: PaypalColors.Orange,
-                  inactiveColor: PaypalColors.Black50,
-                  title: Text('Market'),
-                  icon: Icon(Icons.shopping_cart)),
-              BottomNavyBarItem(
-                  activeColor: PaypalColors.Orange,
-                  inactiveColor: PaypalColors.Black50,
-                  title: Text('My Investation'),
-                  icon: Icon(Icons.attach_money)),
-              BottomNavyBarItem(
-                  activeColor: PaypalColors.Orange,
-                  inactiveColor: PaypalColors.Black50,
-                  title: Text('Calculator'),
-                  icon: Icon(Icons.show_chart)),
-              BottomNavyBarItem(
-                  activeColor: PaypalColors.Orange,
-                  inactiveColor: PaypalColors.Black50,
-                  title: Text('Account'),
-                  icon: Icon(Icons.account_circle)),
+                bottomNavigationBar: BottomNavyBar(
+                  selectedIndex: _currentIndex,
+                  onItemSelected: (index) {
+                    bottomTapped(index);
+                  },
+                  items: <BottomNavyBarItem>[
+                    BottomNavyBarItem(
+                        activeColor: PaypalColors.Orange,
+                        inactiveColor: PaypalColors.Black50,
+                        title: Text('Home'),
+                        icon: Icon(Icons.home)),
+                    BottomNavyBarItem(
+                        activeColor: PaypalColors.Orange,
+                        inactiveColor: PaypalColors.Black50,
+                        title: Text('Market'),
+                        icon: Icon(Icons.shopping_cart)),
+                    BottomNavyBarItem(
+                        activeColor: PaypalColors.Orange,
+                        inactiveColor: PaypalColors.Black50,
+                        title: Text('My Investation'),
+                        icon: Icon(Icons.attach_money)),
+                    BottomNavyBarItem(
+                        activeColor: PaypalColors.Orange,
+                        inactiveColor: PaypalColors.Black50,
+                        title: Text('Calculator'),
+                        icon: Icon(Icons.show_chart)),
+                    BottomNavyBarItem(
+                        activeColor: PaypalColors.Orange,
+                        inactiveColor: PaypalColors.Black50,
+                        title: Text('Account'),
+                        icon: Icon(Icons.account_circle)),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
-      ],
-    ),
-        ),
       ),
     );
-  
   }
 
   AppBar _mainAppBar() {
     return AppBar(
       leading: IconButton(
-          icon: new Icon(Icons.settings),
-          color: PaypalColors.Orange,
-          onPressed: () {
-            //Logout();
-                                        setState(() {
-                              if (isCollapsed)
-                                _controller.forward();
-                              else
-                                _controller.reverse();
+        icon: new Icon(Icons.settings),
+        color: PaypalColors.Orange,
+        onPressed: () {
+          //Logout();
+          setState(() {
+            if (isCollapsed)
+              _controller.forward();
+            else
+              _controller.reverse();
 
-                              isCollapsed = !isCollapsed;
-                            });
-          },
-        ),
+            isCollapsed = !isCollapsed;
+          });
+        },
+      ),
       title: Image.asset('assets/images/Paypal-logo-header.png', height: 25),
       centerTitle: true,
       actions: <Widget>[

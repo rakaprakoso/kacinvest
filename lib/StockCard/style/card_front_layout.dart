@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 
 import '../../util.dart';
 
@@ -12,6 +13,22 @@ class CardFrontLayout {
   double cardWidth;
   double cardHeight;
   Color textColor;
+  String balancestart;
+  String priceNAB;
+  String unitNAB;
+
+  double startbalance, balance,returnamount,returnpercentage;
+  String startbalanceS, balanceS, returnamountS, returnpercentageS;
+
+    FlutterMoneyFormatter fmf = FlutterMoneyFormatter(
+      amount: 0,
+      settings: MoneyFormatterSettings(
+        symbol: 'IDR',
+        thousandSeparator: '.',
+        decimalSeparator: ',',
+        symbolAndNumberSeparator: ' ',
+        fractionDigits: 0,
+      ));
 
   CardFrontLayout(
       {this.bankName = "",
@@ -22,21 +39,24 @@ class CardFrontLayout {
       this.cardTypeIcon,
       this.cardWidth = 0,
       this.cardHeight = 0,
-      this.textColor});
+      this.textColor,
+      this.balancestart = "",
+      this.priceNAB = "",
+      this.unitNAB = "",
+      });
 
   Widget layout2(context) {
+    startbalance = double.parse(balancestart);
+    balance = double.parse(priceNAB)*double.parse(unitNAB);
+    returnamount = balance- startbalance;
+    returnpercentage = returnamount/startbalance*100;
+    
+    returnpercentageS =returnpercentage.toStringAsFixed(2) + " %";
+    balanceS = fmf.copyWith(amount: balance,).output.symbolOnLeft;
+    startbalanceS = fmf.copyWith(amount: startbalance,).output.symbolOnLeft;
+    returnamountS= fmf.copyWith(amount: returnamount,).output.symbolOnLeft;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-      /*child: Container(
-              decoration: BoxDecoration(
-        color: Colors.blue,
-        image: DecorationImage(
-          colorFilter: new ColorFilter.mode(
-              Colors.black.withOpacity(0.3), BlendMode.dstATop),
-          image: AssetImage('assets/images/worldmap.png'),
-          fit: BoxFit.cover,
-        ),
-      ),*/
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,19 +91,6 @@ class CardFrontLayout {
                   ),
                 ),
               ),
-              /*Expanded(
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: new Image.asset(
-                    'assets/images/bg2.jpg',
-                    fit: BoxFit.fitHeight,
-                    width: 30.0,
-                    height: 30.0,
-                    color: textColor,
-                    package: 'awesome_card',
-                  ),
-                ),
-              ),*/
             ],
           ),
           Expanded(
@@ -101,13 +108,13 @@ class CardFrontLayout {
                       children: <Widget>[
                         Text(
                           cardNumber == null || cardNumber.isEmpty
-                              ? 'XXXX XXXX XXXX XXXX'
-                              : cardNumber,
+                              ? ''
+                              : "BALANCE\n" + balanceS,
                           style: TextStyle(
                               package: 'awesome_card',
                               color: textColor,
                               fontWeight: FontWeight.w500,
-                              fontFamily: "MavenPro",
+                              fontFamily: "Montserrat",
                               fontSize: 22),
                         ),
                         SizedBox(
@@ -118,32 +125,19 @@ class CardFrontLayout {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              "Exp. Date",
-                              style: TextStyle(
-                                  package: 'awesome_card',
-                                  color: textColor,
-                                  fontFamily: "MavenPro",
-                                  fontSize: 15),
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Text(
                               cardExpiry == null || cardExpiry.isEmpty
                                   ? "MM/YY"
-                                  : cardExpiry,
+                                  : "RETURN     " + returnamountS + " | " + returnpercentageS,
                               style: TextStyle(
                                   package: 'awesome_card',
                                   color: textColor,
-                                  fontWeight: FontWeight.w500,
                                   fontFamily: "MavenPro",
-                                  fontSize: 16),
+                                  fontSize: 14),
                             ),
+                           
                           ],
                         ),
-                        SizedBox(
-                          height: 15,
-                        ),
+                       
                       ],
                     ),
                     cardTypeIcon
@@ -160,13 +154,13 @@ class CardFrontLayout {
                 child: Text(
                   cardHolderName == null || cardHolderName.isEmpty
                       ? "Card Holder"
-                      : cardHolderName,
+                      : "START BALANCE    " + startbalanceS,
                   style: TextStyle(
                       package: 'awesome_card',
                       color: textColor,
                       fontWeight: FontWeight.w500,
                       fontFamily: "MavenPro",
-                      fontSize: 17),
+                      fontSize: 14),
                 ),
               ),
               Container(
@@ -176,7 +170,7 @@ class CardFrontLayout {
                   textColor: PaypalColors.DarkBlue,
                   child: Text(
                     //"$name",
-                    "Graph",
+                    cardHolderName,
                     style: TextStyle(
                         fontFamily: "worksans",
                         color: PaypalColors.DarkBlue,

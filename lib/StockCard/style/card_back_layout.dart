@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sparkline/flutter_sparkline.dart';
+import 'package:kacinvest/data/account.dart';
 import 'package:kacinvest/pages/main_page.dart';
+import 'package:kacinvest/screens/app.dart';
 
 class CardBackLayout {
   int cardIndex;
@@ -14,6 +16,8 @@ class CardBackLayout {
   List<double> doubleList;
 
   var data = [0.0, 1.0, 10.5, 2.0, 0.0, 0.0, -0.5, -1.0, -0.5, 0.0, 0.0];
+  var chartFIX = accountBloc.productChart;
+  var stock=MenuDashboardPage.listStock;
   var chartss = MyInvestment.chartss;
   var chart = MyInvestment.charts;
   var chart2 = MyInvestment.charts2;
@@ -23,6 +27,7 @@ class CardBackLayout {
 
 
   Widget layout1() {
+    int index = stock.indexOf('${cvv}');
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -72,7 +77,7 @@ class CardBackLayout {
               Container(
                 child: Sparkline(
                   //data: chartsss[cardIndex],
-                  data: chart2[cardIndex],
+                  data: chartFIX[index],
                   lineWidth: 5.0,
                   pointsMode: PointsMode.last,
                   pointSize: 6.0,
@@ -83,6 +88,7 @@ class CardBackLayout {
                 ),
               ),
               Text('${cvv}'),
+              Text('${stock}'),
                Text('${cardIndex}'),
               //Text('${chartsss[0]}'),
               //Text(chartsss[1]),

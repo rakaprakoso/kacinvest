@@ -4,9 +4,13 @@ import 'package:kacinvest/pages/login_screen.dart';
 import 'package:kacinvest/screens/app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'data/main_data.dart';
+
 //void main() => runApp(KacinvestApp());
 
   Future<void> main() async {
+
+    
       WidgetsFlutterBinding.ensureInitialized();
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var username = prefs.getString('username');
@@ -14,10 +18,21 @@ import 'package:shared_preferences/shared_preferences.dart';
       runApp(username == null ? KacinvestAppLogin() : KacinvestApp());
     }
 
-class KacinvestAppLogin extends StatelessWidget {
-
-  
-
+class KacinvestAppLogin extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+class _MyAppState extends State<KacinvestAppLogin> {
+      @override
+  void initState() {
+    super.initState();
+    mainBloc = MainBloc();
+  }
+@override
+  void dispose() {
+    mainBloc = null;
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -42,7 +57,22 @@ class KacinvestAppLogin extends StatelessWidget {
   }
 }
 
-class KacinvestApp extends StatelessWidget {
+
+class KacinvestApp extends StatefulWidget {
+  @override
+  _MyAppState2 createState() => _MyAppState2();
+}
+class _MyAppState2 extends State<KacinvestApp> {
+    @override
+  void initState() {
+    super.initState();
+    mainBloc = MainBloc();
+  }
+@override
+  void dispose() {
+    mainBloc = null;
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(

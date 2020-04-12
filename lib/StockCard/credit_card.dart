@@ -27,6 +27,9 @@ class CreditCard extends StatefulWidget {
   final CardType cardType;
   final double width;
   final double height;
+  final String balancestart;
+  final String priceNAB;
+  final String unitNAB;
 
   CreditCard(
       {Key key,
@@ -47,7 +50,11 @@ class CreditCard extends StatefulWidget {
       this.backTextColor = Colors.black,
       this.showShadow = false,
       this.width,
-      this.height})
+      this.height,
+      this.balancestart,
+      this.priceNAB,
+      this.unitNAB,
+      })
       : assert(frontBackground != null),
         assert(backBackground != null),
         super(key: key);
@@ -71,7 +78,6 @@ class _CreditCardState extends State<CreditCard>
  
   @override
   void initState() {
-    chartModel();
     _controller = new AnimationController(
         duration: new Duration(milliseconds: 1000), vsync: this);
 
@@ -104,43 +110,9 @@ class _CreditCardState extends State<CreditCard>
   @override
   void dispose() {
     _controller.dispose();
-    chartsss3.clear();
     super.dispose();
 
   }
-
-   static var charttemp2;
-  var charttemp23;
-  static List<double> chartss3 = [2, 2, 2, 3];
-  static List<double> chartempty = [];
-  static List<double> chartss4 = [2, 252, 3];
-  static List<List<double>> chartsss3 = [];
-
-  static List<double> doubletemp = [];
-
-    chartModel() async {
-            doubletemp=[];
-
- var stockid = widget.cvv;
-      final url =
-          "http://kacinvest.arkeyproject.com/try/ViewReturn.php?stockid=${stockid}";
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final profiles = json.decode(response.body);
-
-        
-        charttemp2 = profiles;
-
-        for (var j = 0; j < charttemp2.length; j++) {
-          
-  double x = double.parse(charttemp2[j]['PriceNAB_after']);
-        doubletemp.add(x);}
-        
-chartsss3.add(doubletemp);
-
-//chartss3= doubletemp.getRange(100, 200);
-  }
-    }
 
  @override
   Widget build(BuildContext context) {
@@ -163,11 +135,6 @@ chartsss3.add(doubletemp);
           setState(() {
             if (widget.showBackSide==false)
             widget.showBackSide = true;
-
-
-
-      
-
             else
             widget.showBackSide=false;
 
@@ -219,6 +186,9 @@ chartsss3.add(doubletemp);
             // Front Side Layout
             widget.frontLayout ??
                 CardFrontLayout(
+                        balancestart: widget.balancestart,
+                        priceNAB: widget.priceNAB,
+                        unitNAB : widget.unitNAB,
                         bankName: widget.bankName,
                         bankLogo: widget.bankLogo,
                         cardNumber: widget.cardNumber,
@@ -271,8 +241,7 @@ chartsss3.add(doubletemp);
                         cvv: widget.cvv,
                         width: cardWidth,
                         height: cardHeight,
-                        color: widget.backTextColor,
-                        charts: chartss3)
+                        color: widget.backTextColor,)
                     .layout1()
           ],
         ),

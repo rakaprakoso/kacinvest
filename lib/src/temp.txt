@@ -1,0 +1,9 @@
+startbalance = double.parse(balancestart);
+    balance = double.parse(priceNAB)*double.parse(unitNAB);
+    returnamount = balance- startbalance;
+    returnpercentage = returnamount/startbalance*100;
+    
+    returnpercentageS =returnpercentage.toStringAsFixed(2) + " %";
+    balanceS = fmf.copyWith(amount: balance,).output.symbolOnLeft;
+    startbalanceS = fmf.copyWith(amount: balance,).output.symbolOnLeft;
+    returnamountS= fmf.copyWith(amount: balance,).output.symbolOnLeft;
