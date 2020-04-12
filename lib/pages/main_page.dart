@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_sparkline/flutter_sparkline.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:kacinvest/Tab/home_tab.dart';
 import 'package:kacinvest/Tab/shop_tab%20copy.dart';
+import 'package:kacinvest/screens/app.dart';
 import 'package:kacinvest/util.dart';
 import 'shop_items_page.dart';
 import '../custom_icon/spin_icons.dart';
@@ -20,10 +22,15 @@ class MyInvestment extends StatefulWidget {
   @override
   _MyInvestmentState createState() => _MyInvestmentState();
   static var chartss = _MyInvestmentState.chartss;
+  static var charts = _MyInvestmentState.charts22;
+  static var charts2 = _MyInvestmentState.charts2;
 }
 
 class _MyInvestmentState extends State<MyInvestment> {
-  final List<List<double>> charts = [
+  static var charts2 =MenuDashboardPage.charts;
+  static var charts22 =MenuDashboardPage.charts2;
+  //static var charts23 =MenuDashboardPage.chartsss3;
+  static List<List<double>> charts = [
     [
       1.0,
       0.3,
@@ -242,7 +249,12 @@ class _MyInvestmentState extends State<MyInvestment> {
   var chart;
   static List<double> chartss = [];
   var data = [0.0, 1.0, 10.5, 2.0, 0.0, 0.0, -0.5, -1.0, -0.5, 0.0, 0.0];
+  var percentage = HomeTab.returnbalance / HomeTab.currentbalancestart * 100;
   var balance = HomeTab.balance;
+  var stock = MenuDashboardPage.dataa;
+  var tmpchat = MenuDashboardPage.charttemp2;
+
+
   chartModel() async {
     final url = "http://kacinvest.arkeyproject.com/try/ViewReturn.php";
     final response = await http.get(url);
@@ -270,10 +282,105 @@ class _MyInvestmentState extends State<MyInvestment> {
     }
   }
 
+  //-----------------------------------------
+  var charttemp;
+  static List<double> chartss2 = [];
+  static List<List<double>> chartsss2 = [];
+
+  chartModel2() async {
+    int j = 0;
+    while (j < stock.length) {
+      var stockid = stock[j]['stockID'];
+      final url =
+          "http://kacinvest.arkeyproject.com/try/ViewReturn.php?stockid=${stockid}";
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final profiles = json.decode(response.body);
+
+        setState(() {
+          chart = profiles;
+          print(chart);
+          print(chart.length);
+          chartss2.clear();
+          int i = 0;
+          while (i < chart.length) {
+            double j = double.parse(chart[i]['PriceNAB_after']);
+            chartss2.add(j);
+
+            i++;
+          }
+          ;
+        });
+      }
+      setState(() {
+        //chartsss2[j] = chartss2;
+        chartsss2.add(chartss2);
+        print(chartsss2);
+        print(chartsss2.length);
+        //_isLoading = true;
+        //data = chartss;
+      });
+      j++;
+    }
+  }
+//------------------------------------------------------------------
+
+  //-----------------------------------------
+  var charttemp2;
+  var charttemp23;
+  static List<double> chartss3 = [2, 2, 2, 3];
+  static List<double> chartss4 = [2, 252, 3];
+  static List<List<double>> chartsss3 = [];
+
+  static List<double> doubletemp = [];
+
+  chartModel3() async {
+    chartsss3.clear();
+    
+    int i = 0;
+
+    while (i < stock.length) {
+
+      var stockid = stock[i]['stockID'];
+      final url =
+          "http://kacinvest.arkeyproject.com/try/ViewReturn.php?stockid=${stockid}";
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final profiles = json.decode(response.body);
+
+        charttemp2 = profiles;
+      }
+
+for (var i = 0; i < charttemp2.length; i++) {
+  double x = double.parse(charttemp2[i]['PriceNAB_after']);
+        doubletemp.add(x);
+}
+      /*int j = 0;
+      while (j < charttemp2.length) {
+        double x = double.parse(chart[j]['PriceNAB_after']);
+        doubletemp.add(x);
+        j++;
+      };*/
+
+      chartsss2.add(doubletemp);
+
+      //     chartsss3.add(chartss3);
+      //     chartsss3.add(chartss4);
+      //print(chartsss2);
+      //print(chartsss2.length);
+      //charttemp23.add(charttemp2);
+      //charttemp23= charttemp2.take(3).toList();
+      i++;
+    }
+  }
+//------------------------------------------------------------------
+
   @override
   void initState() {
     super.initState();
-    chartModel();
+    //chartModel();
+    //chartModel2();
+    //chartModel3();
   }
 
   @override
@@ -287,8 +394,34 @@ class _MyInvestmentState extends State<MyInvestment> {
           child: Column(
             children: <Widget>[
               _balance(_media),
+              Text('${charts2}'),
+              Text('${tmpchat}'),
+              /*Sparkline(
+                  //data: chartsss[cardIndex],
+                  data: charts22,
+                  lineWidth: 5.0,
+                  pointsMode: PointsMode.last,
+                  pointSize: 6.0,
+                  pointColor: Colors.blueGrey,
+                  fillMode: FillMode.below,
+                  fillColor: Colors.lightGreen,
+                  lineColor: Colors.lightGreen,
+                ),
+                Sparkline(
+                  //data: chartsss[cardIndex],
+                  data: charts2[0],
+                  lineWidth: 5.0,
+                  pointsMode: PointsMode.last,
+                  pointSize: 6.0,
+                  pointColor: Colors.blueGrey,
+                  fillMode: FillMode.below,
+                  fillColor: Colors.lightGreen,
+                  lineColor: Colors.lightGreen,
+                ),*/
+              //Text('${chartsss3}'),
+              //Text('${chartsss3.length}'),
               _invest(),
-              
+
               /*StockCard(),
               SlidingCardsView(),
               
@@ -308,26 +441,25 @@ class _MyInvestmentState extends State<MyInvestment> {
 
   FutureBuilder balanceList() {
     return FutureBuilder(
-        future: getBalance(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            print(snapshot.data);
-            var balance = snapshot.data;
-            // tampilkan dvarata
-            return ListView.builder(
-              itemCount: balance.length,
-              physics: ClampingScrollPhysics(),
-              shrinkWrap: true,
-              itemBuilder: (BuildContext context, int index) {
-                return FadeAnimation(1.5, StockCard());
-              },
-            );
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      );
-    
+      future: getBalance(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          print(snapshot.data);
+          var balance = snapshot.data;
+          // tampilkan dvarata
+          return ListView.builder(
+            itemCount: balance.length,
+            physics: ClampingScrollPhysics(),
+            shrinkWrap: true,
+            itemBuilder: (BuildContext context, int index) {
+              return FadeAnimation(1.5, StockCard(bal: balance, index:index));
+            },
+          );
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
   }
 
   Widget _buildTile(Widget child, {Function() onTap}) {
@@ -365,7 +497,7 @@ class _MyInvestmentState extends State<MyInvestment> {
                         fontFamily: 'Montserrat',
                         fontSize: 13.0,
                       )),
-                  Text('2%',
+                  Text(percentage.toStringAsFixed(2) + ' %',
                       style: TextStyle(
                           fontFamily: 'Montserrat',
                           color: Colors.white,
@@ -404,7 +536,7 @@ class _MyInvestmentState extends State<MyInvestment> {
                                 fontFamily: 'Montserrat',
                                 fontSize: 18.0,
                               )),
-                          Text('2.120.000 IDR',
+                          Text(HomeTab.currentbalance.toStringAsFixed(0),
                               style: TextStyle(
                                   fontFamily: 'Montserrat',
                                   color: Colors.white,
@@ -433,7 +565,7 @@ class _MyInvestmentState extends State<MyInvestment> {
                                 fontFamily: 'Montserrat',
                                 fontSize: 14.0,
                               )),
-                          Text('2.120.000 IDR',
+                          Text(HomeTab.returnbalance.toStringAsFixed(0),
                               style: TextStyle(
                                   fontFamily: 'Montserrat',
                                   color: Colors.white,
@@ -445,7 +577,7 @@ class _MyInvestmentState extends State<MyInvestment> {
                                 fontFamily: 'Montserrat',
                                 fontSize: 14.0,
                               )),
-                          Text('2.120.000 IDR',
+                          Text(HomeTab.currentbalancestart.toStringAsFixed(0),
                               style: TextStyle(
                                   fontFamily: 'Montserrat',
                                   color: Colors.white,
@@ -509,9 +641,25 @@ class _MyInvestmentState extends State<MyInvestment> {
               ],
             ),
           ),
-          balanceList(),
+          Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+              ),
+              child: getbalance()),
         ],
       ),
+    );
+  }
+
+  ListView getbalance() {
+    return ListView.builder(
+      itemCount: balance.length,
+      physics: ClampingScrollPhysics(),
+      shrinkWrap: true,
+      itemBuilder: (BuildContext context, int index) {
+        var balance2 = balance[index];
+        return FadeAnimation(1.5, StockCard(bal: balance2, index:index));
+      },
     );
   }
 }
@@ -667,7 +815,6 @@ class _SlidingCardsViewState extends State<SlidingCardsView> {
               },
               children: <Widget>[
                 Balance(),
-                StockCard(),
                 SlidingCard(
                   name: 'Shenzhen GLOBAL DESIGN AWARD 2018',
                   date: '4.20-30',
@@ -842,8 +989,9 @@ class KeyboardNumber extends StatelessWidget {
 }
 
 class StockCard extends StatefulWidget {
-  StockCard({Key key, this.title}) : super(key: key);
-  final String title;
+  final bal;
+  final int index;
+  const StockCard({Key key, this.bal, this.index}) : super(key: key);
 
   @override
   _StockCardState createState() => _StockCardState();
@@ -855,7 +1003,7 @@ class _StockCardState extends State<StockCard> {
   String expiryDate = "";
   String cvv = "";
   bool showBack = false;
-
+  
   static FocusNode _focusNode;
 
   @override
@@ -890,11 +1038,13 @@ class _StockCardState extends State<StockCard> {
               height: 40,
             ),
             CreditCard(
-              cardNumber: "BALANCE",
+              cardIndex: widget.index,
+              cardNumber: widget.bal['balanceStart'],
               cardExpiry: "expiryDate",
-              cardHolderName: "Raka D Prakoso",
-              cvv: cvv,
-              bankName: "Axis Bank",
+              cardHolderName: widget.bal['username'],
+              cvv: widget.bal['stockID'],
+              bankName: widget.bal['Name'],
+              bankLogo: widget.bal['logo'],
               showBackSide: showBack,
               frontBackground: CardBackgrounds.white,
               backBackground: CardBackgrounds.gray,

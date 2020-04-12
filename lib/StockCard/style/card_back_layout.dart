@@ -3,17 +3,27 @@ import 'package:flutter_sparkline/flutter_sparkline.dart';
 import 'package:kacinvest/pages/main_page.dart';
 
 class CardBackLayout {
+  int cardIndex;
   String cvv;
   double width;
   double height;
   Color color;
   List<double> charts;
-  
+  List<List<double>> chartsss;
+
+  List<double> doubleList;
+
   var data = [0.0, 1.0, 10.5, 2.0, 0.0, 0.0, -0.5, -1.0, -0.5, 0.0, 0.0];
-  var chartss=MyInvestment.chartss;
-  CardBackLayout({this.cvv, this.width, this.height, this.color, this.charts});
+  var chartss = MyInvestment.chartss;
+  var chart = MyInvestment.charts;
+  var chart2 = MyInvestment.charts2;
+  CardBackLayout({this.cardIndex, this.cvv, this.width, this.height, this.color, this.charts});
+
+
+
 
   Widget layout1() {
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,17 +67,26 @@ class CardBackLayout {
         ),*/
         Padding(
           padding: EdgeInsets.all(10),
-          child : Container(
-            child: new Sparkline(
-              data: charts,
-              lineWidth: 5.0,
-              pointsMode: PointsMode.last,
-  pointSize: 6.0,
-  pointColor: Colors.blueGrey,
-  fillMode: FillMode.below,
-  fillColor: Colors.lightGreen,
-  lineColor: Colors.lightGreen,
-            ),
+          child: Column(
+            children: <Widget>[
+              Container(
+                child: Sparkline(
+                  //data: chartsss[cardIndex],
+                  data: chart2[cardIndex],
+                  lineWidth: 5.0,
+                  pointsMode: PointsMode.last,
+                  pointSize: 6.0,
+                  pointColor: Colors.blueGrey,
+                  fillMode: FillMode.below,
+                  fillColor: Colors.lightGreen,
+                  lineColor: Colors.lightGreen,
+                ),
+              ),
+              Text('${cvv}'),
+               Text('${cardIndex}'),
+              //Text('${chartsss[0]}'),
+              //Text(chartsss[1]),
+            ],
           ),
         ),
       ],

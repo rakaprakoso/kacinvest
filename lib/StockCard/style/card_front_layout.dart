@@ -4,6 +4,7 @@ import '../../util.dart';
 
 class CardFrontLayout {
   String bankName;
+  String bankLogo;
   String cardNumber;
   String cardExpiry;
   String cardHolderName;
@@ -14,6 +15,7 @@ class CardFrontLayout {
 
   CardFrontLayout(
       {this.bankName = "",
+      this.bankLogo = "",
       this.cardNumber = "",
       this.cardExpiry = "",
       this.cardHolderName = "",
@@ -49,8 +51,8 @@ class CardFrontLayout {
               Container(
                 height: 60,
                 child: Center(
-                  child: Image.asset(
-                    'assets/images/BNI_logo.png',
+                  child: Image.network(
+                    bankLogo,
                     height: 50,
                     width: 90,
                   ),

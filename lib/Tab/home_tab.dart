@@ -5,6 +5,7 @@ import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 import 'package:intl/intl.dart';
 import 'package:kacinvest/Tab/shop_tab%20copy.dart';
+import 'package:kacinvest/screens/app.dart';
 import 'package:kacinvest/src/data/API.dart';
 import 'package:kacinvest/src/data/data.dart';
 import 'package:kacinvest/src/data/datadb.dart';
@@ -28,6 +29,9 @@ class HomeTab extends StatefulWidget {
   _HomeTabState createState() => _HomeTabState();
   static var profile = _HomeTabState.profile;
   static var balance = _HomeTabState.balance;
+  static double currentbalance = _HomeTabState.currentbalance;
+  static double currentbalancestart = _HomeTabState.currentbalancestart;
+  static double returnbalance = _HomeTabState.returnbalance;
 }
 
 class _HomeTabState extends State<HomeTab> {
@@ -36,9 +40,21 @@ class _HomeTabState extends State<HomeTab> {
   static var profile;
   static var transactions;
   static var balance;
-  static var currentbalance, currentbalancestart, returnbalance;
+  static double currentbalance, currentbalancestart, returnbalance;
   static String _username = '';
+  
+  static var dataa;
 
+    data2() async {
+      setState(() {
+        dataa = MenuDashboardPage.dataa;
+        print('dataa');
+        print(dataa);
+        //print(transactions.length);
+      });
+    
+  }
+  
   _panggil() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var username = prefs.getString('username');
@@ -217,10 +233,11 @@ class _HomeTabState extends State<HomeTab> {
         print(balance.length);
         currentbalancestart = returnbalance = currentbalance = 0;
         int i = 0;
-        int j = int.parse(balance[i]["stockNABunit"]);
-        int k = int.parse(balance[i]["priceNAB"]);
+        
 
         while (i < balance.length) {
+          double j = double.parse(balance[i]["stockNABunit"]);
+      double k = double.parse(balance[i]["priceNAB"]);
           currentbalancestart += int.parse(balance[i]["balanceStart"]);
           currentbalance += (j * k);
           returnbalance = currentbalance - currentbalancestart;
@@ -328,6 +345,7 @@ class _HomeTabState extends State<HomeTab> {
     //_panggil();
     //_balanceModel();
     _gettingdata();
+    data2();
   }
 
   @override
@@ -353,6 +371,7 @@ class _HomeTabState extends State<HomeTab> {
                     //_paypalCard(context),
                     _choiceText(),
                     _topStock(),
+                    _topStock2(dataa),
                     //_carousel(context),
                     _activityText(),
                     //_activityList(context),
@@ -367,6 +386,7 @@ class _HomeTabState extends State<HomeTab> {
 }
 
 Container _headerCard(context) {
+
   var _isLoading = _HomeTabState._isLoading;
   var balance = _HomeTabState.balance;
   double currentbalance = _HomeTabState.currentbalance;
@@ -377,6 +397,11 @@ Container _headerCard(context) {
   var name;
   var profile = _HomeTabState.profile;
   double i, j;
+  i=j=0;
+
+  if(balance.length==0){
+    i=j=0;
+  };
   if (currentbalance == null) {
     i = 0;
   } else {
@@ -393,23 +418,11 @@ Container _headerCard(context) {
     name = profile[0]["firstName"] + " " + profile[0]["lastName"];
   }
 
-  /*var currentbalance, currentbalancestart, returnbalance;
-  currentbalancestart = returnbalance = currentbalance = 0;
-  int i = 0;
-  int j = int.parse(balance[i]["stockNABunit"]);
-  int k = int.parse(balance[i]["priceNAB"]);
-
-  while (i < balance.length) {
-    currentbalancestart += int.parse(balance[i]["balanceStart"]);
-    currentbalance += (j * k);
-    returnbalance = currentbalance - currentbalancestart;
-    i++;
-  }*/
   //var long2 = double.parse(currentbalance);
-  var long2 = i.toDouble();
+ var long2 = i.toDouble();
   var long3 = j.toDouble();
   FlutterMoneyFormatter fmf = FlutterMoneyFormatter(
-      amount: long2,
+      amount: 0,
       settings: MoneyFormatterSettings(
         symbol: 'IDR',
         thousandSeparator: '.',
@@ -431,6 +444,7 @@ Container _headerCard(context) {
       )
       .output
       .nonSymbol;
+
 
   var _username = _HomeTabState._username;
 
@@ -1117,82 +1131,6 @@ Container _activityList(context) {
                 );
               },
 
-              /*children: <Widget>[
-      Container(
-        margin: EdgeInsets.only(bottom: 5, top: 5),
-        decoration: _tileDecoration(),
-        child: ListTile(
-          leading: Image.asset('assets/images/users/Bank_Syariah_Mandiri.png',
-              width: 60),
-          title: Text(
-            'Mandiri Syariah',
-            style: TextStyle(
-                fontFamily: "worksans",
-                fontWeight: FontWeight.w500,
-                color: Colors.black),
-          ),
-          subtitle: Text(
-            'Mar 24, 2020',
-            style:
-                TextStyle(fontFamily: "worksans", fontWeight: FontWeight.w300),
-          ),
-          trailing: Text(
-            '+200.000 IDR',
-            style: TextStyle(fontFamily: "worksans"),
-          ),
-        ),
-      ),
-      Container(
-        margin: EdgeInsets.only(bottom: 5),
-        decoration: _tileDecoration(),
-        child: ListTile(
-          leading: Container(
-            width: 60,
-            child: Image.asset('assets/images/users/Avrist.png'),
-          ),
-          title: Text(
-            'Avrist Equity - Cross Sectoral',
-            style: TextStyle(
-                fontFamily: "worksans",
-                fontWeight: FontWeight.w500,
-                color: Colors.black),
-          ),
-          subtitle: Text(
-            'Mar 16, 2020',
-            style:
-                TextStyle(fontFamily: "worksans", fontWeight: FontWeight.w300),
-          ),
-          trailing: Text(
-            '+150.000 IDR',
-            style: TextStyle(fontFamily: "worksans"),
-          ),
-        ),
-      ),
-      Container(
-        margin: EdgeInsets.only(bottom: 15),
-        decoration: _tileDecoration(),
-        child: ListTile(
-          leading: Image.asset('assets/images/users/Bank_Syariah_Mandiri.png',
-              width: 60),
-          title: Text(
-            'Mandiri Syariah',
-            style: TextStyle(
-                fontFamily: "worksans",
-                fontWeight: FontWeight.w500,
-                color: Colors.black),
-          ),
-          subtitle: Text(
-            'Feb 16, 2020',
-            style:
-                TextStyle(fontFamily: "worksans", fontWeight: FontWeight.w300),
-          ),
-          trailing: Text(
-            '-50.000 IDR',
-            style: TextStyle(fontFamily: "worksans"),
-          ),
-        ),
-      ),
-    ],*/
             ),
     ),
   );
@@ -1589,6 +1527,32 @@ Container _topStock() {
               return ProductCard(
                 imgUrl: stock.logo,
                 name: stock.name,
+                //color: stock.name
+              );
+            },
+          ),
+  );
+}
+
+Container _topStock2(data) {
+  var _isLoading = _HomeTabState._isLoading;
+  //var data = _HomeTabState.data;
+  var _stockproducts = _HomeTabState._stockproducts;
+
+  return Container(
+    height: 190,
+    child: !_isLoading
+        ? new CircularProgressIndicator()
+        : ListView.builder(
+            //itemCount: data.length,
+            itemCount: data.length,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, index) {
+              //var stock = data[index];
+              var stock = data[index];
+              return ProductCard(
+                imgUrl: data[index]['logo'],
+                name: data[index]['Name'],
                 //color: stock.name
               );
             },

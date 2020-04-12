@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 import 'package:intl/intl.dart';
 import 'package:kacinvest/Tab/shop_tab%20copy.dart';
+import 'package:kacinvest/screens/app.dart';
 import 'package:kacinvest/src/data/API.dart';
 import 'package:kacinvest/src/data/data.dart';
 import 'package:kacinvest/src/data/datadb.dart';
@@ -20,6 +22,7 @@ import 'package:kacinvest/util.dart';
 import 'package:kacinvest/Tab/profile.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ShopTab extends StatefulWidget {
@@ -122,10 +125,9 @@ class _ShopTabState extends State<ShopTab> {
       currentbalancestart = returnbalance = currentbalance = 0;
       int i = 0;
 
-
       while (i < balance.length) {
-              double j = double.parse(balance[i]["stockNABunit"]);
-      double k = double.parse(balance[i]["priceNAB"]);
+        double j = double.parse(balance[i]["stockNABunit"]);
+        double k = double.parse(balance[i]["priceNAB"]);
         currentbalancestart += double.parse(balance[i]["balanceStart"]);
         currentbalance += (j * k);
         returnbalance = currentbalance - currentbalancestart;
@@ -266,6 +268,7 @@ class _ShopTabState extends State<ShopTab> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    data22();
     _getData();
     _getStockProducts();
     _stockproducts = [];
@@ -276,7 +279,9 @@ class _ShopTabState extends State<ShopTab> {
     //_balanceCalc();
     //_panggil();
     //_balanceModel();
-    _gettingdata();
+    //_gettingdata();
+    data2();
+
     Services.getStockProducts().then((stocksFromServer) {
       setState(() {
         stocks = stocksFromServer;
@@ -285,14 +290,42 @@ class _ShopTabState extends State<ShopTab> {
     });
   }
 
+  static var dataaa;
+
+  data22() async {
+    setState(() {
+      dataaa = MenuDashboardPage.dataa;
+      print('asdasdasdas');
+      print('${dataaa}');
+      //print(transactions.length);
+    });
+  }
+
   final _debouncer = Debouncer(milliseconds: 500);
   List<StockProduct> stocks = List();
   List<StockProduct> filteredStocks = List();
   TextEditingController editingController = TextEditingController();
+
+  var stocks2;
+  var filteredStocks2;
+
   getStocks() async {
     var response = await http
         .get("http://kacinvest.arkeyproject.com/try/SelectAllUsers.php");
     return jsonDecode(response.body);
+  }
+
+  static var dataa = MenuDashboardPage.dataa;
+
+  data2() async {
+    setState(() {
+      stocks2 = MenuDashboardPage.dataa;
+      filteredStocks2 = stocks2;
+      dataa = MenuDashboardPage.dataa;
+      print('dataaass');
+      print('ISINYA ${filteredStocks}');
+      //print(transactions.length);
+    });
   }
 
   @override
@@ -354,14 +387,16 @@ class _ShopTabState extends State<ShopTab> {
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 15.0,
-                                            fontFamily: "SF-Pro-Display-Bold"),
+                                            fontFamily: "Montserrat"),
                                       ),
                                       Text(
                                         "Stock Product",
                                         style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 45.0,
-                                            fontFamily: "SF-Pro-Display-Bold"),
+                                          color: Colors.white,
+                                          fontSize: 45.0,
+                                          fontFamily: "Montserrat",
+                                          fontWeight: FontWeight.w700,
+                                        ),
                                       )
                                     ],
                                   ),
@@ -416,12 +451,16 @@ class _ShopTabState extends State<ShopTab> {
                                         //filterSearchResults(value);
                                         _debouncer.run(() {
                                           setState(() {
-                                            filteredStocks = stocks
-                                                .where((u) => (u.name
+                                            filteredStocks2 = stocks2
+                                                .where((u) => (u['Name']
                                                         .toLowerCase()
                                                         .contains(string
                                                             .toLowerCase()) ||
-                                                    u.stockID
+                                                    u['stockID']
+                                                        .toLowerCase()
+                                                        .contains(string
+                                                            .toLowerCase()) ||
+                                                    u['category']
                                                         .toLowerCase()
                                                         .contains(string
                                                             .toLowerCase())))
@@ -459,10 +498,12 @@ class _ShopTabState extends State<ShopTab> {
                     ],
                   ),
                 ),
-                category(),
+                //category(),
+
                 //FadeAnimation(1.5, makeItem(image: 'assets/images/BGStock2.jpg', tag: 'red', context: context)),
                 //BuyPage(),
                 stocklist(),
+                //stocklist2(),
                 /*Container(
                   child: NotificationListener<OverscrollIndicatorNotification>(
                     onNotification: (overscroll) {
@@ -518,12 +559,105 @@ class _ShopTabState extends State<ShopTab> {
                     ),
                   ),
                 ),
-              */],
+              */
+              ],
             ),
     );
   }
 
   Container stocklist() {
+    int x = -1;
+    return Container(
+      child: ListView.builder(
+          itemCount: filteredStocks2.length,
+          shrinkWrap: true,
+          physics: ClampingScrollPhysics(),
+          padding: EdgeInsets.all(15),
+          itemBuilder: (BuildContext context, int index) {
+            var textStyle = TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
+            );
+            String risk;
+            if (filteredStocks2[index]['risk'] == '1') {
+              risk = 'Low Risk';
+            } else if (filteredStocks2[index]['risk'] == '2') {
+              risk = 'Medium Risk';
+            } else {
+              risk = 'High Risk';
+            }
+            ;
+            if (index == 0) {
+              return FadeAnimation(
+                  1.5,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        '$risk',
+                        style: textStyle,
+                      ),
+                      SizedBox(height: 10),
+                      makeItem(
+                          image: filteredStocks2[index]['logo'],
+                          tag: filteredStocks2[index]['stockID'],
+                          name: filteredStocks2[index]['Name'],
+                          stockid: filteredStocks2[index]['stockID'],
+                          category: filteredStocks2[index]['category'],
+                          price: filteredStocks2[index]['priceNAB'],
+                          context: context),
+                    ],
+                  ));
+            }
+            ;
+            if (filteredStocks2[index]['risk'] ==
+                filteredStocks2[index - 1]['risk']) {
+              return FadeAnimation(
+                  1.5,
+                  Column(
+                    children: <Widget>[
+                      makeItem(
+                          image: filteredStocks2[index]['logo'],
+                          tag: filteredStocks2[index]['stockID'],
+                          name: filteredStocks2[index]['Name'],
+                          stockid: filteredStocks2[index]['stockID'],
+                          category: filteredStocks2[index]['category'],
+                          price: filteredStocks2[index]['priceNAB'],
+                          context: context),
+                    ],
+                  ));
+            }
+            ;
+            if (filteredStocks2[index]['risk'] !=
+                filteredStocks2[index - 1]['risk']) {
+              return FadeAnimation(
+                  1.5,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      SizedBox(height: 20),
+                      Text(
+                        '$risk',
+                        style: textStyle,
+                      ),
+                      SizedBox(height: 10),
+                      makeItem(
+                          image: filteredStocks2[index]['logo'],
+                          tag: filteredStocks2[index]['stockID'],
+                          name: filteredStocks2[index]['Name'],
+                          stockid: filteredStocks2[index]['stockID'],
+                          category: filteredStocks2[index]['category'],
+                          price: filteredStocks2[index]['priceNAB'],
+                          context: context),
+                    ],
+                  ));
+            }
+            ;
+          }),
+    );
+  }
+
+  Container stocklist2() {
     return Container(
       child: FutureBuilder(
         future: getStocks(),
@@ -543,7 +677,7 @@ class _ShopTabState extends State<ShopTab> {
                     makeItem(
                         image: filteredStocks[index].logo,
                         tag: filteredStocks[index].stockID,
-                        name:filteredStocks[index].name,
+                        name: filteredStocks[index].name,
                         context: context));
               },
             );
@@ -555,7 +689,7 @@ class _ShopTabState extends State<ShopTab> {
     );
   }
 
-  Widget makeItem({image, tag, name, context}) {
+  Widget makeItem({image, tag, name, stockid, category, price, context}) {
     return Hero(
       tag: tag,
       child: GestureDetector(
@@ -564,7 +698,10 @@ class _ShopTabState extends State<ShopTab> {
               context,
               MaterialPageRoute(
                   builder: (context) => Stocks(
+                        name: name,
                         image: image,
+                        stockid: stockid,
+                        price: price,
                       )));
         },
         child: Container(
@@ -594,8 +731,7 @@ class _ShopTabState extends State<ShopTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Expanded(
-                    child: Image.network(image,
-                        fit: BoxFit.contain),
+                    child: Image.network(image, fit: BoxFit.contain),
                     flex: 2,
                   ),
                   SizedBox(width: 10),
@@ -604,17 +740,17 @@ class _ShopTabState extends State<ShopTab> {
                         1.2,
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          
                           children: <Widget>[
                             Text(
                               name,
+                              //stockid,
                               style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              name,
+                              category,
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 12,
@@ -691,12 +827,20 @@ class _ShopTabState extends State<ShopTab> {
               aspectRatio: 2.2 / 1,
               child: FadeAnimation(
                   1.1,
-                  Container(
-                    margin: EdgeInsets.only(right: 10),
-                    child: Center(
-                      child: Text(
-                        "Reksa Dana",
-                        style: TextStyle(fontSize: 17),
+                  MaterialButton(
+                    onPressed: () {
+                      setState(() {
+                        editingController.text = '';
+                        editingController.text = '1';
+                      });
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(right: 10),
+                      child: Center(
+                        child: Text(
+                          "Low Risk",
+                          style: TextStyle(fontSize: 17),
+                        ),
                       ),
                     ),
                   )),
@@ -808,151 +952,384 @@ class Debouncer {
 
 class Stocks extends StatefulWidget {
   final String image;
+  final String stockid;
+  final String price;
+  final String name;
 
-  const Stocks({Key key, this.image}) : super(key: key);
+  const Stocks({Key key, this.name, this.image, this.stockid, this.price})
+      : super(key: key);
 
   @override
   _StocksState createState() => _StocksState();
 }
 
 class _StocksState extends State<Stocks> {
+  final amountTextController = TextEditingController();
+  String result='0';
+  String _username;
+  String amount;
+  String productprice= '';
+
+  _panggil() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var username = prefs.getString('username');
+    print("$username");
+    setState(() => _username = '$username');
+  }
+
+  _convert() async {
+    double price = double.parse(widget.price);
+  productprice= 'Product Price  IDR ' + price.toStringAsFixed(2);
+  }
+
+   _doConversion() async {
+    setState(() {
+      String nums = amountTextController.text;
+
+      List values = nums.split(".");
+
+      var concatenate = StringBuffer();
+
+      values.forEach((item) {
+        concatenate.write(item);
+      });
+
+      double moneyamount = double.parse(concatenate.toString());
+      double price = double.parse(widget.price);
+      double unit = moneyamount / price;
+
+      amount = concatenate.toString();
+
+      /*result = (double.parse(fromTextController.text) *
+              (responseBody["$fromCurrency1" + "_$toCurrency1"]))
+          .toStringAsFixed(2)
+          .toString();*/
+
+      result = unit.toStringAsFixed(2);
+
+      //result = symbol + " " + amount;
+    });
+    print(result);
+  }
+
+     _doConversion2(string) async {
+    setState(() {
+      String nums = amountTextController.text;
+
+      List values = nums.split(".");
+
+      var concatenate = StringBuffer();
+
+      values.forEach((item) {
+        concatenate.write(item);
+      });
+
+      double moneyamount = double.parse(concatenate.toString());
+      double price = double.parse(widget.price);
+      double unit = moneyamount / price;
+
+      amount = concatenate.toString();
+
+      /*result = (double.parse(fromTextController.text) *
+              (responseBody["$fromCurrency1" + "_$toCurrency1"]))
+          .toStringAsFixed(2)
+          .toString();*/
+
+      result = unit.toStringAsFixed(2);
+
+      //result = symbol + " " + amount;
+    });
+    print(result);
+  }
+  _buysell(type) async {
+
+      String nums = amountTextController.text;
+      List values = nums.split(".");
+      var concatenate = StringBuffer();
+      values.forEach((item) {
+        concatenate.write(item);
+      });
+      amount = concatenate.toString();
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var username = prefs.getString('username');
+    final url =
+        "http://kacinvest.arkeyproject.com/try/buysell.php?username=${username}&stockid=${widget.stockid}&amount=${amount}&type=${type}";
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final transaction = json.decode(response.body);
+
+      setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _panggil();
+  _convert();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Hero(
-          tag: 'red',
-          child: Container(
-            height: MediaQuery.of(context).size.height,
-            width: double.infinity,
-            decoration: BoxDecoration(
+          child: Hero(
+        tag: 'red',
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: double.infinity,
+          decoration: BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage(widget.image),
-                fit: BoxFit.cover
-              ),
+                  image: NetworkImage(widget.image), fit: BoxFit.cover),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey[400],
-                  blurRadius: 10,
-                  offset: Offset(0, 10)
-                )
-              ]
-            ),
-            child: Stack(
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 50),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          child: Icon(Icons.arrow_back_ios, color: Colors.white,),
+                    color: Colors.grey[400],
+                    blurRadius: 10,
+                    offset: Offset(0, 10))
+              ]),
+          child: Stack(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 50),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        child: Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.white,
                         ),
                       ),
-                      Container(
-                        width: 35,
-                        height: 35,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white
+                    ),
+                    Container(
+                      width: 35,
+                      height: 35,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle, color: Colors.white),
+                      child: Center(
+                        child: Icon(
+                          Icons.favorite_border,
+                          size: 20,
                         ),
-                        child: Center(
-                          child: Icon(Icons.favorite_border, size: 20,),
-                        ),
-                      )
-                    ],
-                  ),
+                      ),
+                    )
+                  ],
                 ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  width: MediaQuery.of(context).size.width,
-                  height: 500,
-                  child: FadeAnimation(1, Container(
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomRight,
-                        colors: [
-                          Colors.black.withOpacity(.9),
-                          Colors.black.withOpacity(.0),
-                        ]
-                      )
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        FadeAnimation(1.3, Text("Sneakers", style: TextStyle(color: Colors.white, fontSize: 50, fontWeight: FontWeight.bold),)),
-                        SizedBox(height: 25,),
-                        FadeAnimation(1.4, Text("Size", style: TextStyle(color: Colors.white, fontSize: 20),)),
-                        SizedBox(height: 10,),
-                        Row(
-                          children: <Widget>[
-                            FadeAnimation(1.5, Container(
-                              width: 40,
-                              height: 40,
-                              margin: EdgeInsets.only(right: 20),
-                              child: Center(
-                                child: Text('40', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)
-                              ),
-                            )),
-                            FadeAnimation(1.45, Container(
-                              width: 40,
-                              height: 40,
-                              margin: EdgeInsets.only(right: 20),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10)
-                              ),
-                              child: Center(
-                                child: Text('42', style: TextStyle(fontWeight: FontWeight.bold),)
-                              ),
-                            )),
-                            FadeAnimation(1.46, Container(
-                              width: 40,
-                              height: 40,
-                              margin: EdgeInsets.only(right: 20),
-                              child: Center(
-                                child: Text('44', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)
-                              ),
-                            )),
-                            FadeAnimation(1.47, Container(
-                              width: 40,
-                              height: 40,
-                              margin: EdgeInsets.only(right: 20),
-                              child: Center(
-                                child: Text('46', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)
-                              ),
-                            )),
-                          ],
+              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                width: MediaQuery.of(context).size.width,
+                child:
+                    FadeAnimation(
+                      1.2,Container(
+                        padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
+                        decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                                begin: Alignment.bottomRight,
+                                colors: [
+                              Colors.black.withOpacity(.9),
+                              Colors.black.withOpacity(.0),
+                            ])),
+                        child: Material(
+                          elevation: 10,
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20.0),
+                              topRight: Radius.circular(20.0)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: <Widget>[
+                                FadeAnimation(
+                                    1.3,
+                                    Row(
+                                      children: <Widget>[
+                                        Expanded(
+                                          flex:3,
+                                          child: Text(
+                                            "${widget.name}",
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 30,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex:1,
+                                          child: Image.network(
+                                            widget.image
+                                          ),
+                                        ),
+                                      ],
+                                    )),
+                                SizedBox(
+                                  height: 30,
+                                ),
+                                TextField(
+                                  onChanged: (string) {_doConversion2(string);},
+                                  cursorColor: Colors.orange,
+                                  controller: amountTextController,
+                                  inputFormatters: [
+                                    WhitelistingTextInputFormatter.digitsOnly,
+                                    // Fit the validating format.
+                                    //fazer o formater para dinheiro
+                                    new CurrencyInputFormatter()
+                                  ],
+                                  decoration: new InputDecoration(
+                                    prefixText:"IDR ",
+                                    labelText: "Amount",
+                                    fillColor: Colors.white,
+                                    border: new OutlineInputBorder(
+                                      borderRadius:
+                                          new BorderRadius.circular(20.0),
+                                      borderSide: new BorderSide(
+                                        color: Colors.orange,
+                                      ),
+                                    ),
+
+                                    //fillColor: Colors.green
+                                  ),
+                                  style: TextStyle(
+                                      fontSize: 15.0, color: Colors.black),
+                                  keyboardType: TextInputType.numberWithOptions(
+                                      decimal: true),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                FadeAnimation(
+                                    1.4,
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: <Widget>[
+                                        Text(
+                                          productprice,
+                                          style: TextStyle(
+                                              color: Colors.black, fontSize: 14),
+                                        ),
+                                      ],
+                                    )),
+                                FadeAnimation(
+                                    1.4,
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: <Widget>[
+                                        Text(
+                                          'Will get ${result} Unit',
+                                          style: TextStyle(
+                                              color: Colors.black, fontSize: 14),
+                                        ),
+                                      ],
+                                    )),
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+  
+                                        Expanded(
+                                          flex:1,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: MaterialButton(
+                                              color:Colors.orange,
+                                              child: Text('Sell', style:TextStyle(
+                                                color:Colors.white,
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 20,
+                                              )),
+                                              onPressed: () {
+                                                _buysell('0');
+                                                _onAlertWithCustomContentPressed(
+                                                    context);
+                                              },
+                                            ),
+                                          ),
+                                        ),
+
+                                        Expanded(
+                                          flex:1,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: MaterialButton(
+                                              color:Colors.orange,
+                                              child: Text('Buy', style:TextStyle(
+                                                color:Colors.white,
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 20,
+                                              )),
+                                              onPressed: () {
+                                                _buysell('1');
+                                                _onAlertWithCustomContentPressed(
+                                                    context);
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                        SizedBox(height: 60,),
-                        FadeAnimation(1.5, Container(
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15)
-                          ),
-                          child: Center(
-                            child: Text('Buy Now', style: TextStyle(fontWeight: FontWeight.bold),)
-                          ),
-                        )),
-                        SizedBox(height: 30,),
-                      ],
+                      ),
                     ),
-                  )),
-                )
-              ],
-            ),
+              )
+            ],
           ),
-        )
-      ),
+        ),
+      )),
     );
+  }
+
+  _onAlertWithCustomContentPressed(context) {
+    Alert(
+        context: context,
+        title: "LOGIN",
+        content: Column(
+          children: <Widget>[
+            Icon(Icons.check_circle),
+            Text('Success!'),
+          ],
+        ),
+        buttons: [
+          DialogButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              "LOGIN",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+          )
+        ]).show();
+  }
+}
+
+class CurrencyInputFormatter extends TextInputFormatter {
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.selection.baseOffset == 0) {
+      print(true);
+      return newValue;
+    }
+
+    double value = double.parse(newValue.text);
+
+    final formatter = new NumberFormat("###,###.###", "pt-br");
+
+    String newText = formatter.format(value);
+
+    return newValue.copyWith(
+        text: newText,
+        selection: new TextSelection.collapsed(offset: newText.length));
   }
 }

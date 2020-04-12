@@ -220,67 +220,74 @@ class _ShoesState extends State<Shoes> {
                         ]
                       )
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        FadeAnimation(1.3, Text("Sneakers", style: TextStyle(color: Colors.white, fontSize: 50, fontWeight: FontWeight.bold),)),
-                        SizedBox(height: 25,),
-                        FadeAnimation(1.4, Text("Size", style: TextStyle(color: Colors.white, fontSize: 20),)),
-                        SizedBox(height: 10,),
-                        Row(
-                          children: <Widget>[
-                            FadeAnimation(1.5, Container(
-                              width: 40,
-                              height: 40,
-                              margin: EdgeInsets.only(right: 20),
-                              child: Center(
-                                child: Text('40', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)
-                              ),
-                            )),
-                            FadeAnimation(1.45, Container(
-                              width: 40,
-                              height: 40,
-                              margin: EdgeInsets.only(right: 20),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10)
-                              ),
-                              child: Center(
-                                child: Text('42', style: TextStyle(fontWeight: FontWeight.bold),)
-                              ),
-                            )),
-                            FadeAnimation(1.46, Container(
-                              width: 40,
-                              height: 40,
-                              margin: EdgeInsets.only(right: 20),
-                              child: Center(
-                                child: Text('44', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)
-                              ),
-                            )),
-                            FadeAnimation(1.47, Container(
-                              width: 40,
-                              height: 40,
-                              margin: EdgeInsets.only(right: 20),
-                              child: Center(
-                                child: Text('46', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)
-                              ),
-                            )),
-                          ],
-                        ),
-                        SizedBox(height: 60,),
-                        FadeAnimation(1.5, Container(
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15)
+                    child: Material(
+                      elevation : 10,
+                      color: Colors.blue,
+                      borderRadius : BorderRadius.only(
+                    topLeft: Radius.circular(20.0),
+                    topRight: Radius.circular(20.0)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          FadeAnimation(1.3, Text("Sneakers", style: TextStyle(color: Colors.white, fontSize: 50, fontWeight: FontWeight.bold),)),
+                          SizedBox(height: 25,),
+                          FadeAnimation(1.4, Text("Size", style: TextStyle(color: Colors.white, fontSize: 20),)),
+                          SizedBox(height: 10,),
+                          Row(
+                            children: <Widget>[
+                              FadeAnimation(1.5, Container(
+                                width: 40,
+                                height: 40,
+                                margin: EdgeInsets.only(right: 20),
+                                child: Center(
+                                  child: Text('40', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)
+                                ),
+                              )),
+                              FadeAnimation(1.45, Container(
+                                width: 40,
+                                height: 40,
+                                margin: EdgeInsets.only(right: 20),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10)
+                                ),
+                                child: Center(
+                                  child: Text('42', style: TextStyle(fontWeight: FontWeight.bold),)
+                                ),
+                              )),
+                              FadeAnimation(1.46, Container(
+                                width: 40,
+                                height: 40,
+                                margin: EdgeInsets.only(right: 20),
+                                child: Center(
+                                  child: Text('44', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)
+                                ),
+                              )),
+                              FadeAnimation(1.47, Container(
+                                width: 40,
+                                height: 40,
+                                margin: EdgeInsets.only(right: 20),
+                                child: Center(
+                                  child: Text('46', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)
+                                ),
+                              )),
+                            ],
                           ),
-                          child: Center(
-                            child: Text('Buy Now', style: TextStyle(fontWeight: FontWeight.bold),)
-                          ),
-                        )),
-                        SizedBox(height: 30,),
-                      ],
+                          SizedBox(height: 60,),
+                          FadeAnimation(1.5, Container(
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15)
+                            ),
+                            child: Center(
+                              child: Text('Buy Now', style: TextStyle(fontWeight: FontWeight.bold),)
+                            ),
+                          )),
+                          SizedBox(height: 30,),
+                        ],
+                      ),
                     ),
                   )),
                 )

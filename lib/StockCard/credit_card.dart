@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:kacinvest/StockCard/awesome_card.dart';
@@ -5,12 +6,15 @@ import 'package:kacinvest/StockCard/extra/helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kacinvest/pages/main_page.dart';
+import 'package:http/http.dart' as http;
 
 class CreditCard extends StatefulWidget {
+  final int cardIndex;
   final String cardNumber;
   final String cardExpiry;
   final String cardHolderName;
   final String bankName;
+  final String bankLogo;
   final String cvv;
   final Color frontTextColor;
   final Color backTextColor;
@@ -26,10 +30,12 @@ class CreditCard extends StatefulWidget {
 
   CreditCard(
       {Key key,
+      this.cardIndex,
       this.cardNumber,
       this.cardExpiry,
       this.cardHolderName,
       this.bankName = "",
+      this.bankLogo,
       this.cvv,
       this.showBackSide = false,
       @required this.frontBackground,
@@ -58,10 +64,14 @@ class _CreditCardState extends State<CreditCard>
   Animation<double> _moveToBack;
   Animation<double> _moveToFront;
 
-static var chartss=MyInvestment.chartss;
+//static var chartss=MyInvestment.chartss;
 
+
+
+ 
   @override
   void initState() {
+    chartModel();
     _controller = new AnimationController(
         duration: new Duration(milliseconds: 1000), vsync: this);
 
@@ -94,10 +104,45 @@ static var chartss=MyInvestment.chartss;
   @override
   void dispose() {
     _controller.dispose();
+    chartsss3.clear();
     super.dispose();
+
   }
 
-  @override
+   static var charttemp2;
+  var charttemp23;
+  static List<double> chartss3 = [2, 2, 2, 3];
+  static List<double> chartempty = [];
+  static List<double> chartss4 = [2, 252, 3];
+  static List<List<double>> chartsss3 = [];
+
+  static List<double> doubletemp = [];
+
+    chartModel() async {
+            doubletemp=[];
+
+ var stockid = widget.cvv;
+      final url =
+          "http://kacinvest.arkeyproject.com/try/ViewReturn.php?stockid=${stockid}";
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final profiles = json.decode(response.body);
+
+        
+        charttemp2 = profiles;
+
+        for (var j = 0; j < charttemp2.length; j++) {
+          
+  double x = double.parse(charttemp2[j]['PriceNAB_after']);
+        doubletemp.add(x);}
+        
+chartsss3.add(doubletemp);
+
+//chartss3= doubletemp.getRange(100, 200);
+  }
+    }
+
+ @override
   Widget build(BuildContext context) {
     widget.width == null
         ? cardWidth = MediaQuery.of(context).size.width - 40
@@ -118,6 +163,11 @@ static var chartss=MyInvestment.chartss;
           setState(() {
             if (widget.showBackSide==false)
             widget.showBackSide = true;
+
+
+
+      
+
             else
             widget.showBackSide=false;
 
@@ -170,6 +220,7 @@ static var chartss=MyInvestment.chartss;
             widget.frontLayout ??
                 CardFrontLayout(
                         bankName: widget.bankName,
+                        bankLogo: widget.bankLogo,
                         cardNumber: widget.cardNumber,
                         cardExpiry: widget.cardExpiry,
                         cardHolderName: widget.cardHolderName,
@@ -216,11 +267,12 @@ static var chartss=MyInvestment.chartss;
             // Back Side Layout
             widget.backLayout ??
                 CardBackLayout(
+                        cardIndex: widget.cardIndex,
                         cvv: widget.cvv,
                         width: cardWidth,
                         height: cardHeight,
                         color: widget.backTextColor,
-                        charts : chartss)
+                        charts: chartss3)
                     .layout1()
           ],
         ),

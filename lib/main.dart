@@ -43,9 +43,6 @@ class KacinvestAppLogin extends StatelessWidget {
 }
 
 class KacinvestApp extends StatelessWidget {
-
-  
-
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(

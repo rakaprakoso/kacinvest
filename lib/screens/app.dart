@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,7 @@ import 'package:kacinvest/Tab/calculator_tab.dart';
 import 'package:kacinvest/Tab/profile.dart';
 import 'package:kacinvest/Tab/shop_tab.dart';
 import 'package:kacinvest/Tab/sidebar.dart';
+import 'package:kacinvest/custom_icon/kacinvest_icon_icons.dart';
 import 'package:kacinvest/pages/login_screen.dart';
 import 'package:kacinvest/screens/first_tab.dart';
 import 'package:kacinvest/screens/account.dart';
@@ -15,194 +18,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../util.dart';
 
-class App extends StatefulWidget {
-  App({Key key, this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<App> {
-  int _currentIndex = 0;
-  PageController _pageController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController();
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  void pageChanged(int index) {
-    setState(() {
-      this._currentIndex = index;
-    });
-  }
-
-  void bottomTapped(int index) {
-    setState(() {
-      this._currentIndex = index;
-      _pageController.animateToPage(index,
-          duration: Duration(milliseconds: 1000), curve: Curves.ease);
-    });
-  }
-
-  void creditcardTapped(int index) {
-    setState(() {
-      this._currentIndex = index;
-    });
-  }
-
-  getStringValuesSF() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    //Return String
-    String stringValue = prefs.getString('username');
-    return stringValue;
-  }
-
-  Logout() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove('username');
-
-    var route = new MaterialPageRoute(
-        builder: (BuildContext context) =>
-            //new App(idUser: data[0]['user_id'],firstname: data[0]['first_name'],lastname: data[0]['last_name'],username: data[0]['username'],),
-            new LoginScreen());
-    Navigator.of(context).pushReplacement(route);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return PageView(
-      children: <Widget>[
-        Scaffold(
-          //appBar: AppBar(title: Text("Nav Bar")),
-          appBar: PreferredSize(
-            child: Container(
-              decoration: BoxDecoration(boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  offset: Offset(0, 1.0),
-                  blurRadius: 10.0,
-                )
-              ]),
-              child: _mainAppBar(),
-            ),
-            preferredSize: Size.fromHeight(kToolbarHeight),
-          ),
-          //backgroundColor: PaypalColors.LightOrange,
-          body: DoubleBackToCloseApp(
-            child: SizedBox.expand(
-              child: buildPageView(),
-            ),
-            snackBar: const SnackBar(
-              duration: Duration(seconds: 1),
-              content: Text('Tap back again to leave'),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
-            ),
-          ),
-
-          bottomNavigationBar: BottomNavyBar(
-            selectedIndex: _currentIndex,
-            onItemSelected: (index) {
-              bottomTapped(index);
-            },
-            items: <BottomNavyBarItem>[
-              BottomNavyBarItem(
-                  activeColor: PaypalColors.Orange,
-                  inactiveColor: PaypalColors.Black50,
-                  title: Text('Home'),
-                  icon: Icon(Icons.home)),
-              BottomNavyBarItem(
-                  activeColor: PaypalColors.Orange,
-                  inactiveColor: PaypalColors.Black50,
-                  title: Text('Market'),
-                  icon: Icon(Icons.shopping_cart)),
-              BottomNavyBarItem(
-                  activeColor: PaypalColors.Orange,
-                  inactiveColor: PaypalColors.Black50,
-                  title: Text('My Investation'),
-                  icon: Icon(Icons.attach_money)),
-              BottomNavyBarItem(
-                  activeColor: PaypalColors.Orange,
-                  inactiveColor: PaypalColors.Black50,
-                  title: Text('Calculator'),
-                  icon: Icon(Icons.show_chart)),
-              BottomNavyBarItem(
-                  activeColor: PaypalColors.Orange,
-                  inactiveColor: PaypalColors.Black50,
-                  title: Text('Account'),
-                  icon: Icon(Icons.account_circle)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  AppBar _mainAppBar() {
-    return AppBar(
-      leading: Image.asset(
-        'assets/images/icon_settings.png',
-        color: PaypalColors.Orange,
-      ),
-      title: Image.asset('assets/images/Paypal-logo-header.png', height: 25),
-      centerTitle: true,
-      actions: <Widget>[
-        /*Image.asset(
-          'assets/images/icon_school-bell.png',
-          color: PaypalColors.Orange,
-        )*/
-        new IconButton(
-          icon: new Icon(Icons.cancel),
-          color: PaypalColors.Orange,
-          onPressed: () {
-            Logout();
-          },
-        ),
-      ],
-      backgroundColor: Colors.white,
-      elevation: 10.0,
-    );
-  }
-
-  Widget buildPageView() {
-    return PageView(
-      controller: _pageController,
-      onPageChanged: (index) {
-        pageChanged(index);
-      },
-      children: <Widget>[
-        HomeTab(),
-        //MenuDashboardPage(),
-        ShopTab(),
-        //OtpScreen(),
-        //MarketTab(),
-        MyInvestment(),
-        CalculatorTab(),
-        Profile(),
-      ],
-    );
-  }
-}
+import 'package:http/http.dart' as http;
 
 final Color backgroundColor = Color(0xFF4A4A58);
 
 class MenuDashboardPage extends StatefulWidget {
   @override
   _MenuDashboardPageState createState() => _MenuDashboardPageState();
+  static var dataa=_MenuDashboardPageState.dataa;
+  static var charts=_MenuDashboardPageState.chartsss3;
+  static var charts2=_MenuDashboardPageState.chartss3;
+  static var charttemp2=_MenuDashboardPageState.charttemp2;
 }
 
 class _MenuDashboardPageState extends State<MenuDashboardPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   int _currentIndex = 0;
   PageController _pageController;
 
@@ -265,6 +95,8 @@ class _MenuDashboardPageState extends State<MenuDashboardPage>
   Animation<double> _menuScaleAnimation;
   Animation<Offset> _slideAnimation;
 
+  AnimationController animationController;
+
   @override
   void initState() {
     super.initState();
@@ -275,6 +107,13 @@ class _MenuDashboardPageState extends State<MenuDashboardPage>
     _slideAnimation = Tween<Offset>(begin: Offset(-1, 0), end: Offset(0, 0))
         .animate(_controller);
     _pageController = PageController();
+    _getData();
+    animationController = new AnimationController(
+      vsync: this,
+      duration: new Duration(seconds: 1),
+    );
+
+    animationController.repeat();
   }
 
   @override
@@ -284,6 +123,135 @@ class _MenuDashboardPageState extends State<MenuDashboardPage>
     _pageController.dispose();
   }
 
+//GET DATA------------------------------------------
+  static var _isLoading = false;
+  static var dataa;
+  _getData() async {
+    final url = "http://kacinvest.arkeyproject.com/try/SelectAllUsers.php";
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final users = json.decode(response.body);
+
+      setState(() {
+        //_isLoading = true;
+        dataa = users;
+        print(dataa);
+        print(dataa.length);
+      });
+
+          //int i = 0;
+
+    //while (i < dataa.length) {
+//while (i < 1) {
+  //doubletemp.clear();
+      //charttemp2.clear();
+      
+int x=0;
+for (var i = 0; i < dataa.length; i++) {
+ var stockid = dataa[i]['stockID'];
+      final url =
+          "http://kacinvest.arkeyproject.com/try/ViewReturn.php?stockid=${stockid}";
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final profiles = json.decode(response.body);
+
+        
+        charttemp2 = profiles;
+
+        for (var j = 0; j < charttemp2.length; j++) {
+          
+  double x = double.parse(charttemp2[j]['PriceNAB_after']);
+        doubletemp.add(x);}
+        
+chartsss3.add(doubletemp);
+doubletemp=[];
+chartss3= doubletemp;
+
+
+      }
+}
+
+      /*int j = 0;
+      while (j < charttemp2.length) {
+        double x = double.parse(chart[j]['PriceNAB_after']);
+        doubletemp.add(x);
+        j++;
+      };*/
+
+      
+      
+
+           //if(i==1)chartsss3.add(chartss3);
+           //else chartsss3.add(chartss4);
+      //     chartsss3.add(chartss4);
+      //print('${chartsss3}');
+      //print(chartsss2.length);
+      //charttemp23.add(charttemp2);
+      //charttemp23= charttemp2.take(3).toList();
+    //  i++;
+    //}
+          setState(() {
+        _isLoading = true;
+      });
+    }
+
+
+  }
+
+  //RETURN
+    //-----------------------------------------
+  static var charttemp2;
+  var charttemp23;
+  static List<double> chartss3 = [2, 2, 2, 3];
+  static List<double> chartempty = [];
+  static List<double> chartss4 = [2, 252, 3];
+  static List<List<double>> chartsss3 = [];
+
+  static List<double> doubletemp = [];
+
+  chartModel3() async {
+    //chartsss3.clear();
+    
+    int i = 0;
+
+    while (i < dataa.length) {
+
+      var stockid = dataa[i]['stockID'];
+      final url =
+          "http://kacinvest.arkeyproject.com/try/ViewReturn.php?stockid=${stockid}";
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final profiles = json.decode(response.body);
+
+        charttemp2 = profiles;
+      }
+
+for (var i = 0; i < charttemp2.length; i++) {
+  double x = double.parse(charttemp2[i]['PriceNAB_after']);
+        doubletemp.add(x);
+}
+      /*int j = 0;
+      while (j < charttemp2.length) {
+        double x = double.parse(chart[j]['PriceNAB_after']);
+        doubletemp.add(x);
+        j++;
+      };*/
+var chartempty2 = doubletemp.getRange(20, 80);
+      chartsss3.add(chartempty2);
+
+      //     chartsss3.add(chartss3);
+      //     chartsss3.add(chartss4);
+      //print('${chartsss3}');
+      //print(chartsss2.length);
+      //charttemp23.add(charttemp2);
+      //charttemp23= charttemp2.take(3).toList();
+      i++;
+    }
+  }
+//------------------------------------------------------------------
+
+
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -292,7 +260,9 @@ class _MenuDashboardPageState extends State<MenuDashboardPage>
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
+      body: !_isLoading
+              ? splashscreen(context)
+              : Stack(
         children: <Widget>[
           menu(context),
           dashboard2(context),
@@ -300,6 +270,39 @@ class _MenuDashboardPageState extends State<MenuDashboardPage>
       ),
     );
   }
+
+Widget splashscreen(context){
+      Size size = MediaQuery.of(context).size;
+    screenHeight = size.height;
+    screenWidth = size.width;
+  return Center(
+      child: Container(
+        height: screenHeight *0.6,
+        child: Column(
+          children: <Widget>[
+            new Image.asset('assets/images/KacinvestLogo.png',width:screenWidth*0.6,),
+            new AnimatedBuilder(
+              animation: animationController,
+              child: new Container(
+                height: 150.0,
+                width: 150.0,
+                child: new Icon(
+                  KacinvestIcon.spin4,
+                    color: Colors.orange, size: 60.0
+                ),
+              ),
+              builder: (BuildContext context, Widget _widget) {
+                return new Transform.rotate(
+                  angle: animationController.value * 6.3,
+                  child: _widget,
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+  );
+}
 
   Widget menu(context) {
     return SlideTransition(
