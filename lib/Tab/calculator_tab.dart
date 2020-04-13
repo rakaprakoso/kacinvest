@@ -274,7 +274,7 @@ class _CurrencyConverterState2 extends State<CurrencyConverter2> {
   final fromTextController = TextEditingController();
   List<String> currencies;
   String fromCurrency = "Euro";
-  String toCurrency = "Euro";
+  String toCurrency = "Indonesian Rupiah";
   String result;
   List<String> currenciesName = [];
   List<String> currenciesSymbol = [];
